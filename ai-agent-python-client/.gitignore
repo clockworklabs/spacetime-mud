@@ -1,0 +1,14 @@
+# General
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Virtual environments
+venv/
+*.venv/
+
+# dist folder
+/dist/
+/spacetimedb_python_sdk.egg-info/
