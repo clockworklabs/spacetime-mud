@@ -24,10 +24,7 @@ function App() {
 
     if (command === "") return;
 
-    setConsole((prev) => {
-      // you can also set the console with your own responses or modify the color here when adding the new html elements
-      return [...prev, <p>{command}</p>];
-    });
+    gameController.on_command(command);
 
     setCommand("");
   };

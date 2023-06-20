@@ -4,10 +4,8 @@
 // @ts-ignore
 import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
 
-export class CreatePlayerReducer
-{
-	public static call(name: string, description: string)
-	{
+export class CreatePlayerReducer {
+	public static call(name: string, description: string) {
 		if (__SPACETIMEDB__.spacetimeDBClient) {
 			__SPACETIMEDB__.spacetimeDBClient.call("create_player", [name, description]);
 		}
@@ -23,8 +21,7 @@ export class CreatePlayerReducer
 		return [name, description];
 	}
 
-	public static on(callback: (status: string, identity: string, reducerArgs: any[]) => void)
-	{
+	public static on(callback: (status: string, identity: string, reducerArgs: any[]) => void) {
 		if (__SPACETIMEDB__.spacetimeDBClient) {
 			__SPACETIMEDB__.spacetimeDBClient.on("reducer:CreatePlayer", callback);
 		}
