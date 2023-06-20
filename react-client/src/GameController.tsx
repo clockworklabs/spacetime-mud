@@ -42,24 +42,24 @@ export class GameController {
     public init(): void {
         console.log("Initializing game controller");
         this.client.connect();
-        this.client.subscribe([
-            "SELECT * FROM Mobile",
-            "SELECT * FROM Player",
-            "SELECT * FROM Location",
-            "SELECT * FROM World",
-            "SELECT * FROM Zone",
-            "SELECT * FROM Room",
-            "SELECT * FROM RoomChat",
-            "SELECT * FROM DirectMessage"
-        ]);
 
         this.client.onConnect((identity: Uint8Array) => {
             console.log("SpacetimeDB connected");
             this.local_identity = identity;
+            this.client.subscribe([
+                "SELECT * FROM Mobile",
+                "SELECT * FROM Player",
+                "SELECT * FROM Location",
+                "SELECT * FROM World",
+                "SELECT * FROM Zone",
+                "SELECT * FROM Room",
+                "SELECT * FROM RoomChat",
+                "SELECT * FROM DirectMessage"
+            ]);
         });
 
         this.client.on('initialStateSync', () => {
-            console.log("SpacetimeDB Initial state sync");
+            console.log("SpacetimeDB Initial state sync, player count: " + Player.count());
             var player = Player.filterByIdentity(this.local_identity);
             if (player) {
                 this.gameState = GameState.GAME;
@@ -80,6 +80,7 @@ export class GameController {
 
         create_player_reducer.on((status: string, identity: string, reducerArgs: any[]) => {
             var identity_array = (new TextEncoder()).encode(identity);
+            console.log("CreatePlayerReducer called with status: " + status + " by " + identity + " with args: " + reducerArgs);
             if (identity_array === this.local_identity && status === "committed") {
                 console.log("CreatePlayerReducer called with status: " + status + " by " + identity + " with args: " + reducerArgs);
                 var player = Player.filterByIdentity(this.local_identity);

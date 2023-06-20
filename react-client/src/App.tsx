@@ -1,20 +1,21 @@
-import React, { FormEvent, useState, useEffect } from "react";
+import React, { FormEvent, useState, useEffect, useRef } from "react";
 import "./App.css";
 
 import { GameController } from './GameController'; // Adjust the path if necessary
 
+var gameControllerGlobal = new GameController();
 function App() {
-  const [gameController] = useState(new GameController());
+  const gameController = useRef(gameControllerGlobal);
   const [console, setConsole] = useState<JSX.Element[]>([]);
   const [command, setCommand] = React.useState<string>("");
 
   useEffect(() => {
-    gameController.init();
-    gameController.setConsoleFunction(setConsole);
+    gameController.current.init();
+    gameController.current.setConsoleFunction(setConsole);
 
     // Clean up function: you can close the game controller when the component unmounts
     return () => {
-      gameController.close();
+      gameController.current.close();
     };
   }, []); // Empty dependency array: run this effect once on mount, and clean up on unmount
 
@@ -24,7 +25,7 @@ function App() {
 
     if (command === "") return;
 
-    gameController.on_command(command);
+    gameController.current.on_command(command);
 
     setCommand("");
   };
