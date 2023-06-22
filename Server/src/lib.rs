@@ -61,7 +61,11 @@ pub fn sign_in(_ctx: ReducerContext, player_spawnable_entity_id: u64) -> Result<
     let mut location = Location::filter_by_spawnable_entity_id(&player_spawnable_entity_id)
         .unwrap()
         .clone();
-    location.room_id = location.last_room_id.clone();
+    if location.last_room_id.is_some() {
+        location.room_id = location.last_room_id.clone();
+    } else {
+        location.room_id = Some("start".into());
+    }
     location.last_room_id = None;
     Location::update_by_spawnable_entity_id(&player_spawnable_entity_id, location);
 

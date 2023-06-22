@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0,"../../spacetimedb-python-sdk/")
+
 import asyncio
 from conversation import Conversation
 from global_vars import GlobalVars
@@ -74,4 +77,6 @@ if __name__ == "__main__":
                         "SELECT * FROM World",
                         "SELECT * FROM DirectMessage"]))
     except KeyboardInterrupt:
+        for conversation in conversations.values():
+            conversation.close()
         asyncio.run(spacetime_client.close())
