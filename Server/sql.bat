@@ -1,0 +1,1 @@
+D:\dev\clockwork\SpacetimeDBPrivate\target\debug\spacetime sql example-mud %1

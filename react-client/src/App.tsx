@@ -1,19 +1,31 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useState, useEffect, useRef } from "react";
 import "./App.css";
 
+import { GameController } from './GameController'; // Adjust the path if necessary
+
+var gameControllerGlobal = new GameController();
 function App() {
+  const gameController = useRef(gameControllerGlobal);
   const [console, setConsole] = useState<JSX.Element[]>([]);
   const [command, setCommand] = React.useState<string>("");
+
+  useEffect(() => {
+    gameController.current.init();
+    gameController.current.setConsoleFunction(setConsole);
+
+    // Clean up function: you can close the game controller when the component unmounts
+    return () => {
+      gameController.current.close();
+    };
+  }, []); // Empty dependency array: run this effect once on mount, and clean up on unmount
+
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (command === "") return;
 
-    setConsole((prev) => {
-      // you can also set the console with your own responses or modify the color here when adding the new html elements
-      return [...prev, <p>{command}</p>];
-    });
+    gameController.current.on_command(command);
 
     setCommand("");
   };
