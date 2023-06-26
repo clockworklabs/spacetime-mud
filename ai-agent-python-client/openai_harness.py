@@ -1,7 +1,7 @@
 import threading
 import openai
 
-import game_config
+import spacetimedb_python_sdk.local_config as local_config
 import json
 
 max_openai_calls_retries = 3
@@ -21,11 +21,11 @@ def openai_call(
 
     global initialized    
     if not initialized:
-        openai.api_key = game_config.get_string("openapi_key")        
+        openai.api_key = local_config.get_string("openapi_key")        
         initialized = True
 
     if not model:
-        model = game_config.get_string("openapi_model")
+        model = local_config.get_string("openapi_model")
     if not model:
         model = "gpt-3.5-turbo"
     global openai_calls_retried

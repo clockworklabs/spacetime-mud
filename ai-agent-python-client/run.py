@@ -5,9 +5,8 @@ import asyncio
 from conversation import Conversation
 from global_vars import GlobalVars
 
-import game_config
-
 from spacetimedb_python_sdk.spacetimedb_async_client import SpacetimeDBAsyncClient
+import spacetimedb_python_sdk.local_config as local_config
 
 import autogen
 from autogen.player import Player
@@ -15,7 +14,15 @@ from autogen.mobile import Mobile
 import autogen.create_player_reducer as create_player_reducer
 import autogen.tell_reducer as tell_reducer
 
-auth_token = game_config.get_string("auth")
+# check to see if the user specified an openai key
+default_open_ai_key = None
+if "--openai" in sys.argv:
+    openai_index = sys.argv.index("--openai")
+    print("Using openai key: {}".format(sys.argv[openai_index + 1]))
+    default_open_ai_key = sys.argv[openai_index + 1]
+
+local_config.init(".spacetime_mud", "settings_ai_agent.ini", config_defaults={ "openapi_key": default_open_ai_key })
+auth_token = local_config.get_string("auth")
 spacetime_client = SpacetimeDBAsyncClient(autogen)
 
 logged_in = False
@@ -23,7 +30,7 @@ logged_in = False
 conversations = {}
 
 def on_connect(auth_token,identity):  
-    game_config.set_string("auth", auth_token)
+    local_config.set_string("auth", auth_token)
     GlobalVars.local_identity = identity
     print(f"Connected.")    
     
