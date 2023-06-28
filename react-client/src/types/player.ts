@@ -2,13 +2,15 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export class Player extends IDatabaseTable
 {
 	public static tableName = "Player";
 	public spawnableEntityId: number;
 	public identity: Uint8Array;
+
+	public static primaryKey: string | undefined = "spawnable_entity_id";
 
 	constructor(spawnableEntityId: number, identity: Uint8Array) {
 	super();
@@ -50,12 +52,10 @@ export class Player extends IDatabaseTable
 
 	public static filterBySpawnableEntityId(value: number): Player | null
 	{
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Player").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Player").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[0].asNumber() as number;
-			if (compareValue == value) {
-				return Player.fromValue(entry);
+			if (instance.spawnableEntityId === value) {
+				return instance;
 			}
 		}
 		return null;
@@ -63,56 +63,54 @@ export class Player extends IDatabaseTable
 
 	public static filterByIdentity(value: Uint8Array): Player | null
 	{
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Player").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Player").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[1].asBytes() as Uint8Array;
 			let byteArrayCompare = function (a1: Uint8Array, a2: Uint8Array)
 			{
-			    if (a1.length != a2.length)
+			    if (a1.length !== a2.length)
 			        return false;
 
 			    for (let i=0; i<a1.length; i++)
-			        if (a1[i]!=a2[i])
+			        if (a1[i]!==a2[i])
 			            return false;
 
 			    return true;
 			}
 
-			if (byteArrayCompare(compareValue, value)) {
-				return Player.fromValue(entry);
+			if (byteArrayCompare(instance.identity, value)) {
+				return instance;
 			}
 		}
 		return null;
 	}
 
 
-	public static onInsert(callback: (value: Player) => void)
+	public static onInsert(callback: (value: Player, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Player").onInsert(callback);
 	}
 
-	public static onUpdate(callback: (oldValue: Player, newValue: Player) => void)
+	public static onUpdate(callback: (oldValue: Player, newValue: Player, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Player").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Player) => void)
+	public static onDelete(callback: (value: Player, oldValue: Player, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Player").onDelete(callback);
 	}
 
-	public static removeOnInsert(callback: (value: Player) => void)
+	public static removeOnInsert(callback: (value: Player, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Player").removeOnInsert(callback);
 	}
 
-	public static removeOnUpdate(callback: (oldValue: Player, newValue: Player) => void)
+	public static removeOnUpdate(callback: (oldValue: Player, newValue: Player, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Player").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Player) => void)
+	public static removeOnDelete(callback: (value: Player, oldValue: Player, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Player").removeOnDelete(callback);
 	}

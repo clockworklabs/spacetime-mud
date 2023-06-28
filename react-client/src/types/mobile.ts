@@ -2,7 +2,7 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export class Mobile extends IDatabaseTable
 {
@@ -10,6 +10,8 @@ export class Mobile extends IDatabaseTable
 	public spawnableEntityId: number;
 	public name: string;
 	public description: string;
+
+	public static primaryKey: string | undefined = "spawnable_entity_id";
 
 	constructor(spawnableEntityId: number, name: string, description: string) {
 	super();
@@ -54,72 +56,66 @@ export class Mobile extends IDatabaseTable
 
 	public static filterBySpawnableEntityId(value: number): Mobile | null
 	{
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Mobile").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Mobile").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[0].asNumber() as number;
-			if (compareValue == value) {
-				return Mobile.fromValue(entry);
+			if (instance.spawnableEntityId === value) {
+				return instance;
 			}
 		}
 		return null;
 	}
 
-	public static filterByName(value: string): Mobile[] | null
+	public static filterByName(value: string): Mobile[]
 	{
 		let result: Mobile[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Mobile").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Mobile").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[1].asString() as string;
-			if (compareValue == value) {
-				result.push(Mobile.fromValue(entry));
+			if (instance.name === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByDescription(value: string): Mobile[] | null
+	public static filterByDescription(value: string): Mobile[]
 	{
 		let result: Mobile[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Mobile").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Mobile").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[2].asString() as string;
-			if (compareValue == value) {
-				result.push(Mobile.fromValue(entry));
+			if (instance.description === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
 
-	public static onInsert(callback: (value: Mobile) => void)
+	public static onInsert(callback: (value: Mobile, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Mobile").onInsert(callback);
 	}
 
-	public static onUpdate(callback: (oldValue: Mobile, newValue: Mobile) => void)
+	public static onUpdate(callback: (oldValue: Mobile, newValue: Mobile, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Mobile").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Mobile) => void)
+	public static onDelete(callback: (value: Mobile, oldValue: Mobile, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Mobile").onDelete(callback);
 	}
 
-	public static removeOnInsert(callback: (value: Mobile) => void)
+	public static removeOnInsert(callback: (value: Mobile, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Mobile").removeOnInsert(callback);
 	}
 
-	public static removeOnUpdate(callback: (oldValue: Mobile, newValue: Mobile) => void)
+	public static removeOnUpdate(callback: (oldValue: Mobile, newValue: Mobile, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Mobile").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Mobile) => void)
+	public static removeOnDelete(callback: (value: Mobile, oldValue: Mobile, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Mobile").removeOnDelete(callback);
 	}

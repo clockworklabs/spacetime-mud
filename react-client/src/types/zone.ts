@@ -2,7 +2,7 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export class Zone extends IDatabaseTable
 {
@@ -12,6 +12,8 @@ export class Zone extends IDatabaseTable
 	public name: string;
 	public description: string;
 	public connectingZones: string[];
+
+	public static primaryKey: string | undefined = "zone_id";
 
 	constructor(zoneId: string, worldId: string, name: string, description: string, connectingZones: string[]) {
 	super();
@@ -63,86 +65,78 @@ export class Zone extends IDatabaseTable
 
 	public static filterByZoneId(value: string): Zone | null
 	{
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Zone").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Zone").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[0].asString() as string;
-			if (compareValue == value) {
-				return Zone.fromValue(entry);
+			if (instance.zoneId === value) {
+				return instance;
 			}
 		}
 		return null;
 	}
 
-	public static filterByWorldId(value: string): Zone[] | null
+	public static filterByWorldId(value: string): Zone[]
 	{
 		let result: Zone[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Zone").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Zone").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[1].asString() as string;
-			if (compareValue == value) {
-				result.push(Zone.fromValue(entry));
+			if (instance.worldId === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByName(value: string): Zone[] | null
+	public static filterByName(value: string): Zone[]
 	{
 		let result: Zone[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Zone").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Zone").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[2].asString() as string;
-			if (compareValue == value) {
-				result.push(Zone.fromValue(entry));
+			if (instance.name === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByDescription(value: string): Zone[] | null
+	public static filterByDescription(value: string): Zone[]
 	{
 		let result: Zone[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Zone").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Zone").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[3].asString() as string;
-			if (compareValue == value) {
-				result.push(Zone.fromValue(entry));
+			if (instance.description === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
 
-	public static onInsert(callback: (value: Zone) => void)
+	public static onInsert(callback: (value: Zone, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Zone").onInsert(callback);
 	}
 
-	public static onUpdate(callback: (oldValue: Zone, newValue: Zone) => void)
+	public static onUpdate(callback: (oldValue: Zone, newValue: Zone, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Zone").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Zone) => void)
+	public static onDelete(callback: (value: Zone, oldValue: Zone, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Zone").onDelete(callback);
 	}
 
-	public static removeOnInsert(callback: (value: Zone) => void)
+	public static removeOnInsert(callback: (value: Zone, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Zone").removeOnInsert(callback);
 	}
 
-	public static removeOnUpdate(callback: (oldValue: Zone, newValue: Zone) => void)
+	public static removeOnUpdate(callback: (oldValue: Zone, newValue: Zone, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Zone").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Zone) => void)
+	public static removeOnDelete(callback: (value: Zone, oldValue: Zone, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Zone").removeOnDelete(callback);
 	}

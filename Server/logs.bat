@@ -1,0 +1,1 @@
+D:\dev\clockwork\SpacetimeDB\target\debug\spacetime logs -f example-mud

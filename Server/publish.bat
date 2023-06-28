@@ -1,1 +1,1 @@
-D:\dev\clockwork\SpacetimeDBPrivate\target\debug\spacetime publish -c example-mud
+D:\dev\clockwork\SpacetimeDB\target\debug\spacetime publish -c example-mud

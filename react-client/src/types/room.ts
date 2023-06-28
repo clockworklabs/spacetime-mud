@@ -2,7 +2,7 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 // @ts-ignore
 import { Exit } from "./exit";
 
@@ -14,6 +14,8 @@ export class Room extends IDatabaseTable
 	public name: string;
 	public description: string;
 	public exits: Exit[];
+
+	public static primaryKey: string | undefined = "room_id";
 
 	constructor(roomId: string, zoneId: string, name: string, description: string, exits: Exit[]) {
 	super();
@@ -65,86 +67,78 @@ export class Room extends IDatabaseTable
 
 	public static filterByRoomId(value: string): Room | null
 	{
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Room").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Room").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[0].asString() as string;
-			if (compareValue == value) {
-				return Room.fromValue(entry);
+			if (instance.roomId === value) {
+				return instance;
 			}
 		}
 		return null;
 	}
 
-	public static filterByZoneId(value: string): Room[] | null
+	public static filterByZoneId(value: string): Room[]
 	{
 		let result: Room[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Room").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Room").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[1].asString() as string;
-			if (compareValue == value) {
-				result.push(Room.fromValue(entry));
+			if (instance.zoneId === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByName(value: string): Room[] | null
+	public static filterByName(value: string): Room[]
 	{
 		let result: Room[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Room").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Room").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[2].asString() as string;
-			if (compareValue == value) {
-				result.push(Room.fromValue(entry));
+			if (instance.name === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByDescription(value: string): Room[] | null
+	public static filterByDescription(value: string): Room[]
 	{
 		let result: Room[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Room").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Room").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[3].asString() as string;
-			if (compareValue == value) {
-				result.push(Room.fromValue(entry));
+			if (instance.description === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
 
-	public static onInsert(callback: (value: Room) => void)
+	public static onInsert(callback: (value: Room, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Room").onInsert(callback);
 	}
 
-	public static onUpdate(callback: (oldValue: Room, newValue: Room) => void)
+	public static onUpdate(callback: (oldValue: Room, newValue: Room, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Room").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Room) => void)
+	public static onDelete(callback: (value: Room, oldValue: Room, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Room").onDelete(callback);
 	}
 
-	public static removeOnInsert(callback: (value: Room) => void)
+	public static removeOnInsert(callback: (value: Room, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Room").removeOnInsert(callback);
 	}
 
-	public static removeOnUpdate(callback: (oldValue: Room, newValue: Room) => void)
+	public static removeOnUpdate(callback: (oldValue: Room, newValue: Room, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Room").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Room) => void)
+	public static removeOnDelete(callback: (value: Room, oldValue: Room, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Room").removeOnDelete(callback);
 	}

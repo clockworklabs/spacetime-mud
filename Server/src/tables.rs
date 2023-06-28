@@ -3,7 +3,7 @@ use spacetimedb::{spacetimedb, Identity, SpacetimeType, Timestamp};
 #[spacetimedb(table)]
 #[derive(Debug, Clone)]
 pub struct Globals {
-    #[unique]
+    #[primarykey]
     pub id: u32,
 
     pub spawnable_entity_id_counter: u64,
@@ -12,7 +12,7 @@ pub struct Globals {
 #[spacetimedb(table)]
 #[derive(Clone)]
 pub struct Location {
-    #[unique]
+    #[primarykey]
     #[autoinc]
     pub spawnable_entity_id: u64,
 
@@ -22,7 +22,7 @@ pub struct Location {
 
 #[spacetimedb(table)]
 pub struct Mobile {
-    #[unique]
+    #[primarykey]
     pub spawnable_entity_id: u64,
 
     pub name: String,
@@ -31,7 +31,7 @@ pub struct Mobile {
 
 #[spacetimedb(table)]
 pub struct Player {
-    #[unique]
+    #[primarykey]
     pub spawnable_entity_id: u64,
     #[unique]
     pub identity: Identity,
@@ -40,7 +40,7 @@ pub struct Player {
 #[derive(Clone)]
 #[spacetimedb(table)]
 pub struct Room {
-    #[unique]
+    #[primarykey]
     pub room_id: String,
 
     pub zone_id: String,
@@ -53,7 +53,7 @@ pub struct Room {
 #[derive(Clone)]
 #[spacetimedb(table)]
 pub struct World {
-    #[unique]
+    #[primarykey]
     pub world_id: String,
 
     pub name: String,
@@ -63,7 +63,7 @@ pub struct World {
 #[derive(Clone)]
 #[spacetimedb(table)]
 pub struct Zone {
-    #[unique]
+    #[primarykey]
     pub zone_id: String,
 
     pub world_id: String,
@@ -75,7 +75,7 @@ pub struct Zone {
 
 #[spacetimedb(table)]
 pub struct RoomChat {
-    #[unique]
+    #[primarykey]
     #[autoinc]
     pub chat_entity_id: u64,
 
@@ -87,7 +87,7 @@ pub struct RoomChat {
 
 #[spacetimedb(table)]
 pub struct DirectMessage {
-    #[unique]
+    #[primarykey]
     #[autoinc]
     pub whisper_entity_id: u64,
 

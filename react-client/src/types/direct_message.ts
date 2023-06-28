@@ -2,7 +2,7 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export class DirectMessage extends IDatabaseTable
 {
@@ -12,6 +12,8 @@ export class DirectMessage extends IDatabaseTable
 	public targetSpawnableEntityId: number;
 	public chatText: string;
 	public timestamp: number;
+
+	public static primaryKey: string | undefined = "whisper_entity_id";
 
 	constructor(whisperEntityId: number, sourceSpawnableEntityId: number, targetSpawnableEntityId: number, chatText: string, timestamp: number) {
 	super();
@@ -62,100 +64,90 @@ export class DirectMessage extends IDatabaseTable
 
 	public static filterByWhisperEntityId(value: number): DirectMessage | null
 	{
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("DirectMessage").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("DirectMessage").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[0].asNumber() as number;
-			if (compareValue == value) {
-				return DirectMessage.fromValue(entry);
+			if (instance.whisperEntityId === value) {
+				return instance;
 			}
 		}
 		return null;
 	}
 
-	public static filterBySourceSpawnableEntityId(value: number): DirectMessage[] | null
+	public static filterBySourceSpawnableEntityId(value: number): DirectMessage[]
 	{
 		let result: DirectMessage[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("DirectMessage").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("DirectMessage").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[1].asNumber() as number;
-			if (compareValue == value) {
-				result.push(DirectMessage.fromValue(entry));
+			if (instance.sourceSpawnableEntityId === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByTargetSpawnableEntityId(value: number): DirectMessage[] | null
+	public static filterByTargetSpawnableEntityId(value: number): DirectMessage[]
 	{
 		let result: DirectMessage[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("DirectMessage").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("DirectMessage").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[2].asNumber() as number;
-			if (compareValue == value) {
-				result.push(DirectMessage.fromValue(entry));
+			if (instance.targetSpawnableEntityId === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByChatText(value: string): DirectMessage[] | null
+	public static filterByChatText(value: string): DirectMessage[]
 	{
 		let result: DirectMessage[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("DirectMessage").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("DirectMessage").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[3].asString() as string;
-			if (compareValue == value) {
-				result.push(DirectMessage.fromValue(entry));
+			if (instance.chatText === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByTimestamp(value: number): DirectMessage[] | null
+	public static filterByTimestamp(value: number): DirectMessage[]
 	{
 		let result: DirectMessage[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("DirectMessage").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("DirectMessage").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[4].asNumber() as number;
-			if (compareValue == value) {
-				result.push(DirectMessage.fromValue(entry));
+			if (instance.timestamp === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
 
-	public static onInsert(callback: (value: DirectMessage) => void)
+	public static onInsert(callback: (value: DirectMessage, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("DirectMessage").onInsert(callback);
 	}
 
-	public static onUpdate(callback: (oldValue: DirectMessage, newValue: DirectMessage) => void)
+	public static onUpdate(callback: (oldValue: DirectMessage, newValue: DirectMessage, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("DirectMessage").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: DirectMessage) => void)
+	public static onDelete(callback: (value: DirectMessage, oldValue: DirectMessage, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("DirectMessage").onDelete(callback);
 	}
 
-	public static removeOnInsert(callback: (value: DirectMessage) => void)
+	public static removeOnInsert(callback: (value: DirectMessage, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("DirectMessage").removeOnInsert(callback);
 	}
 
-	public static removeOnUpdate(callback: (oldValue: DirectMessage, newValue: DirectMessage) => void)
+	public static removeOnUpdate(callback: (oldValue: DirectMessage, newValue: DirectMessage, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("DirectMessage").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: DirectMessage) => void)
+	public static removeOnDelete(callback: (value: DirectMessage, oldValue: DirectMessage, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("DirectMessage").removeOnDelete(callback);
 	}

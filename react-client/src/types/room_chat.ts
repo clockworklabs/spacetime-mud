@@ -2,7 +2,7 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export class RoomChat extends IDatabaseTable
 {
@@ -12,6 +12,8 @@ export class RoomChat extends IDatabaseTable
 	public sourceSpawnableEntityId: number;
 	public chatText: string;
 	public timestamp: number;
+
+	public static primaryKey: string | undefined = "chat_entity_id";
 
 	constructor(chatEntityId: number, roomId: string, sourceSpawnableEntityId: number, chatText: string, timestamp: number) {
 	super();
@@ -62,100 +64,90 @@ export class RoomChat extends IDatabaseTable
 
 	public static filterByChatEntityId(value: number): RoomChat | null
 	{
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("RoomChat").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("RoomChat").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[0].asNumber() as number;
-			if (compareValue == value) {
-				return RoomChat.fromValue(entry);
+			if (instance.chatEntityId === value) {
+				return instance;
 			}
 		}
 		return null;
 	}
 
-	public static filterByRoomId(value: string): RoomChat[] | null
+	public static filterByRoomId(value: string): RoomChat[]
 	{
 		let result: RoomChat[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("RoomChat").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("RoomChat").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[1].asString() as string;
-			if (compareValue == value) {
-				result.push(RoomChat.fromValue(entry));
+			if (instance.roomId === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterBySourceSpawnableEntityId(value: number): RoomChat[] | null
+	public static filterBySourceSpawnableEntityId(value: number): RoomChat[]
 	{
 		let result: RoomChat[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("RoomChat").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("RoomChat").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[2].asNumber() as number;
-			if (compareValue == value) {
-				result.push(RoomChat.fromValue(entry));
+			if (instance.sourceSpawnableEntityId === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByChatText(value: string): RoomChat[] | null
+	public static filterByChatText(value: string): RoomChat[]
 	{
 		let result: RoomChat[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("RoomChat").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("RoomChat").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[3].asString() as string;
-			if (compareValue == value) {
-				result.push(RoomChat.fromValue(entry));
+			if (instance.chatText === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByTimestamp(value: number): RoomChat[] | null
+	public static filterByTimestamp(value: number): RoomChat[]
 	{
 		let result: RoomChat[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("RoomChat").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("RoomChat").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[4].asNumber() as number;
-			if (compareValue == value) {
-				result.push(RoomChat.fromValue(entry));
+			if (instance.timestamp === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
 
-	public static onInsert(callback: (value: RoomChat) => void)
+	public static onInsert(callback: (value: RoomChat, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("RoomChat").onInsert(callback);
 	}
 
-	public static onUpdate(callback: (oldValue: RoomChat, newValue: RoomChat) => void)
+	public static onUpdate(callback: (oldValue: RoomChat, newValue: RoomChat, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("RoomChat").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: RoomChat) => void)
+	public static onDelete(callback: (value: RoomChat, oldValue: RoomChat, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("RoomChat").onDelete(callback);
 	}
 
-	public static removeOnInsert(callback: (value: RoomChat) => void)
+	public static removeOnInsert(callback: (value: RoomChat, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("RoomChat").removeOnInsert(callback);
 	}
 
-	public static removeOnUpdate(callback: (oldValue: RoomChat, newValue: RoomChat) => void)
+	public static removeOnUpdate(callback: (oldValue: RoomChat, newValue: RoomChat, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("RoomChat").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: RoomChat) => void)
+	public static removeOnDelete(callback: (value: RoomChat, oldValue: RoomChat, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("RoomChat").removeOnDelete(callback);
 	}

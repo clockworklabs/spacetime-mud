@@ -2,7 +2,7 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export class World extends IDatabaseTable
 {
@@ -10,6 +10,8 @@ export class World extends IDatabaseTable
 	public worldId: string;
 	public name: string;
 	public description: string;
+
+	public static primaryKey: string | undefined = "world_id";
 
 	constructor(worldId: string, name: string, description: string) {
 	super();
@@ -54,72 +56,66 @@ export class World extends IDatabaseTable
 
 	public static filterByWorldId(value: string): World | null
 	{
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("World").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("World").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[0].asString() as string;
-			if (compareValue == value) {
-				return World.fromValue(entry);
+			if (instance.worldId === value) {
+				return instance;
 			}
 		}
 		return null;
 	}
 
-	public static filterByName(value: string): World[] | null
+	public static filterByName(value: string): World[]
 	{
 		let result: World[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("World").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("World").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[1].asString() as string;
-			if (compareValue == value) {
-				result.push(World.fromValue(entry));
+			if (instance.name === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
-	public static filterByDescription(value: string): World[] | null
+	public static filterByDescription(value: string): World[]
 	{
 		let result: World[] = [];
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("World").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("World").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[2].asString() as string;
-			if (compareValue == value) {
-				result.push(World.fromValue(entry));
+			if (instance.description === value) {
+				result.push(instance);
 			}
 		}
 		return result;
 	}
 
 
-	public static onInsert(callback: (value: World) => void)
+	public static onInsert(callback: (value: World, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("World").onInsert(callback);
 	}
 
-	public static onUpdate(callback: (oldValue: World, newValue: World) => void)
+	public static onUpdate(callback: (oldValue: World, newValue: World, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("World").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: World) => void)
+	public static onDelete(callback: (value: World, oldValue: World, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("World").onDelete(callback);
 	}
 
-	public static removeOnInsert(callback: (value: World) => void)
+	public static removeOnInsert(callback: (value: World, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("World").removeOnInsert(callback);
 	}
 
-	public static removeOnUpdate(callback: (oldValue: World, newValue: World) => void)
+	public static removeOnUpdate(callback: (oldValue: World, newValue: World, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("World").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: World) => void)
+	public static removeOnDelete(callback: (value: World, oldValue: World, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("World").removeOnDelete(callback);
 	}

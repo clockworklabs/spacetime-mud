@@ -87,7 +87,7 @@ class Conversation:
     # this function is called from the worker thread
     def process_command(self, command: str, prompt_info: PromptInfo):
         if command == "create_room":
-            prompt = f"{self.prompt_prefix}\n\nWorld Info: \n\n{json.dumps(prompt_info.source_world.data)}\n\Current Room Info: \n\n{json.dumps(prompt_info.source_room.data, cls=RoomEncoder)}\n\nUser Prompt:\n\n{prompt_info.prompt}.\n\nThe user has asked you to create a room adjoining the room they are currently in. The user should have provided some information about the new room and the direction from their current room to put the exit. Directions can be anything as long as you can understand what the direction is for both rooms but you can not reuse a direction that already exists in the current room. If you are able to complete the request, respond in the following JSON format: {{\"room_id\": \"room_id_of_new_room\", \"room_name\": \"name_of_new_room\", \"room_description\": \"description_of_new_room\", \"source_room_exit_direction\": \"direction_from_source_room_to_new_room\", \"new_room_exit_direction\": \"direction_from_new_room_to_source_room\", \"message\": \"Friendly response to the user telling them you processed the request\"}}\n\nIf you can't reasonably complete the request, write a response to the user in a friendly tone explaining why you can not complete the request in JSON format {{ \"message\": \"Hello\" }}" 
+            prompt = f"{self.prompt_prefix}\n\nWorld Info: \n\n{json.dumps(prompt_info.source_world.data)}\nCurrent Room Info: \n\n{json.dumps(prompt_info.source_room.data, cls=RoomEncoder)}\n\nUser Prompt:\n\n{prompt_info.prompt}.\n\nThe user has asked you to create a room adjoining the room they are currently in. The user should have provided some information about the new room and the direction from their current room to put the exit. Make sure you use the direction indicated by the User Prompt and not the direction in the Current Room Info. If you are able to complete the request, respond in the following JSON format: {{\"room_id\": \"room_id_of_new_room\", \"room_name\": \"name_of_new_room\", \"room_description\": \"description_of_new_room\", \"source_room_exit_direction\": \"direction_from_source_room_to_new_room\", \"new_room_exit_direction\": \"direction_from_new_room_to_source_room\", \"message\": \"Friendly response to the user telling them you processed the request\"}}\n\nIf you can't reasonably complete the request, write a response to the user in a friendly tone explaining why you can not complete the request in JSON format {{ \"message\": \"Hello\" }}" 
 
             message_json = None
             try:
@@ -103,6 +103,11 @@ class Conversation:
                 exit_direction = message_json['source_room_exit_direction']
                 if exit_direction in [exit.direction for exit in prompt_info.source_room.exits]:
                     print("OpenAI Prompt Error: Exit already exists in that direction")
+                    self.respond("I'm having trouble responding. Please try again.")
+                    self.thinking = False
+                    return
+                if Room.filter_by_room_id(message_json['room_id']):
+                    print("OpenAI Prompt Error: Room already exists with that ID")
                     self.respond("I'm having trouble responding. Please try again.")
                     self.thinking = False
                     return

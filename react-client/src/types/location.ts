@@ -2,7 +2,7 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export class Location extends IDatabaseTable
 {
@@ -10,6 +10,8 @@ export class Location extends IDatabaseTable
 	public spawnableEntityId: number;
 	public roomId: string | null;
 	public lastRoomId: string | null;
+
+	public static primaryKey: string | undefined = "spawnable_entity_id";
 
 	constructor(spawnableEntityId: number, roomId: string | null, lastRoomId: string | null) {
 	super();
@@ -62,44 +64,42 @@ export class Location extends IDatabaseTable
 
 	public static filterBySpawnableEntityId(value: number): Location | null
 	{
-		for(let entry of __SPACETIMEDB__.clientDB.getTable("Location").getEntries())
+		for(let instance of __SPACETIMEDB__.clientDB.getTable("Location").getInstances())
 		{
-			var productValue = entry.asProductValue();
-			let compareValue = productValue.elements[0].asNumber() as number;
-			if (compareValue == value) {
-				return Location.fromValue(entry);
+			if (instance.spawnableEntityId === value) {
+				return instance;
 			}
 		}
 		return null;
 	}
 
 
-	public static onInsert(callback: (value: Location) => void)
+	public static onInsert(callback: (value: Location, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Location").onInsert(callback);
 	}
 
-	public static onUpdate(callback: (oldValue: Location, newValue: Location) => void)
+	public static onUpdate(callback: (oldValue: Location, newValue: Location, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Location").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Location) => void)
+	public static onDelete(callback: (value: Location, oldValue: Location, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Location").onDelete(callback);
 	}
 
-	public static removeOnInsert(callback: (value: Location) => void)
+	public static removeOnInsert(callback: (value: Location, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Location").removeOnInsert(callback);
 	}
 
-	public static removeOnUpdate(callback: (oldValue: Location, newValue: Location) => void)
+	public static removeOnUpdate(callback: (oldValue: Location, newValue: Location, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Location").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Location) => void)
+	public static removeOnDelete(callback: (value: Location, oldValue: Location, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Location").removeOnDelete(callback);
 	}

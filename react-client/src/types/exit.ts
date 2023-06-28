@@ -2,7 +2,7 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export class Exit extends IDatabaseTable
 {
@@ -10,6 +10,8 @@ export class Exit extends IDatabaseTable
 	public direction: string;
 	public examine: string;
 	public destinationRoomId: string;
+
+	public static primaryKey: string | undefined = undefined;
 
 	constructor(direction: string, examine: string, destinationRoomId: string) {
 	super();

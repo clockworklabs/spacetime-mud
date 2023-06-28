@@ -10,3 +10,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 spacetimedb = { path = "../../SpacetimeDBPrivate/crates/bindings" }
+log = "0.4"
