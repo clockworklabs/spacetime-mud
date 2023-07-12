@@ -2,28 +2,33 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue, ReducerArgsAdapter, SumTypeVariant, Serializer } from "@clockworklabs/spacetimedb-sdk";
 
 export class GoReducer
 {
-	public static call(sourceSpawnableEntityId: number, exitDirection: string)
+	public static call(_sourceSpawnableEntityId: number, _exitDirection: string)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
-			__SPACETIMEDB__.spacetimeDBClient.call("go", [sourceSpawnableEntityId, exitDirection]);
+		const serializer = __SPACETIMEDB__.spacetimeDBClient.getSerializer();
+		let _sourceSpawnableEntityIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
+		serializer.write(_sourceSpawnableEntityIdType, _sourceSpawnableEntityId);
+		let _exitDirectionType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_exitDirectionType, _exitDirection);
+			__SPACETIMEDB__.spacetimeDBClient.call("go", serializer);
 		}
 	}
 
-	public static deserializeArgs(rawArgs: any[]): any[] {
-		let sourceSpawnableEntityIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U64);
-		let sourceSpawnableEntityIdValue = AlgebraicValue.deserialize(sourceSpawnableEntityIdType, rawArgs[0])
+	public static deserializeArgs(adapter: ReducerArgsAdapter): any[] {
+		let sourceSpawnableEntityIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
+		let sourceSpawnableEntityIdValue = AlgebraicValue.deserialize(sourceSpawnableEntityIdType, adapter.next())
 		let sourceSpawnableEntityId = sourceSpawnableEntityIdValue.asNumber();
 		let exitDirectionType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let exitDirectionValue = AlgebraicValue.deserialize(exitDirectionType, rawArgs[1])
+		let exitDirectionValue = AlgebraicValue.deserialize(exitDirectionType, adapter.next())
 		let exitDirection = exitDirectionValue.asString();
 		return [sourceSpawnableEntityId, exitDirection];
 	}
 
-	public static on(callback: (status: string, identity: string, reducerArgs: any[]) => void)
+	public static on(callback: (status: string, identity: Uint8Array, reducerArgs: any[]) => void)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
 			__SPACETIMEDB__.spacetimeDBClient.on("reducer:Go", callback);

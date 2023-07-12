@@ -15,7 +15,7 @@ export class Room extends IDatabaseTable
 	public description: string;
 	public exits: Exit[];
 
-	public static primaryKey: string | undefined = "room_id";
+	public static primaryKey: string | undefined = "roomId";
 
 	constructor(roomId: string, zoneId: string, name: string, description: string, exits: Exit[]) {
 	super();
@@ -123,7 +123,7 @@ export class Room extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Room").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Room, oldValue: Room, reducerEvent: ReducerEvent | undefined) => void)
+	public static onDelete(callback: (value: Room, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Room").onDelete(callback);
 	}
@@ -138,7 +138,7 @@ export class Room extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Room").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Room, oldValue: Room, reducerEvent: ReducerEvent | undefined) => void)
+	public static removeOnDelete(callback: (value: Room, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Room").removeOnDelete(callback);
 	}

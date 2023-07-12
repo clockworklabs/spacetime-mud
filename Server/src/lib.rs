@@ -1,21 +1,13 @@
-pub mod helpers;
 pub mod tables;
 
 use std::time::Duration;
 
-use helpers::next_spawnable_entity_id;
 use log;
 use spacetimedb::{schedule, spacetimedb, ReducerContext};
-use tables::{DirectMessage, Exit, Globals, Location, Mobile, Player, Room, RoomChat, World, Zone};
+use tables::{DirectMessage, Exit, Location, Mobile, Player, Room, RoomChat, World, Zone};
 
 #[spacetimedb(init)]
 pub fn initialize() {
-    Globals::insert(Globals {
-        id: 0,
-        spawnable_entity_id_counter: 0,
-    })
-    .unwrap();
-
     World::insert(World {
         world_id: "nexus".into(),
         name: "Nexus".into(),
@@ -73,7 +65,7 @@ pub fn disconnect(ctx: ReducerContext) {
 }
 
 #[spacetimedb(reducer)]
-pub fn sign_in(_ctx: ReducerContext, player_spawnable_entity_id: u64) -> Result<(), String> {
+pub fn sign_in(_ctx: ReducerContext, player_spawnable_entity_id: u32) -> Result<(), String> {
     let mut location = Location::filter_by_spawnable_entity_id(&player_spawnable_entity_id)
         .unwrap()
         .clone();
@@ -89,7 +81,7 @@ pub fn sign_in(_ctx: ReducerContext, player_spawnable_entity_id: u64) -> Result<
 }
 
 #[spacetimedb(reducer)]
-pub fn sign_out(_ctx: ReducerContext, player_spawnable_entity_id: u64) -> Result<(), String> {
+pub fn sign_out(_ctx: ReducerContext, player_spawnable_entity_id: u32) -> Result<(), String> {
     let mut location = Location::filter_by_spawnable_entity_id(&player_spawnable_entity_id)
         .unwrap()
         .clone();
@@ -106,14 +98,15 @@ pub fn create_player(ctx: ReducerContext, name: String, description: String) -> 
         return Err("Player already exists".into());
     }
 
-    let spawnable_entity_id = next_spawnable_entity_id();
-
-    Location::insert(Location {
-        spawnable_entity_id: spawnable_entity_id,
+    let result = Location::insert(Location {
+        spawnable_entity_id: 0,
         room_id: Some("start".into()),
         last_room_id: None,
     })
     .unwrap();
+
+    let spawnable_entity_id = result.spawnable_entity_id;
+
     Mobile::insert(Mobile {
         spawnable_entity_id: spawnable_entity_id,
         name,
@@ -132,7 +125,7 @@ pub fn create_player(ctx: ReducerContext, name: String, description: String) -> 
 #[spacetimedb(reducer)]
 pub fn say(
     ctx: ReducerContext,
-    source_spawnable_entity_id: u64,
+    source_spawnable_entity_id: u32,
     chat_text: String,
 ) -> Result<(), String> {
     if let Some(location) = Location::filter_by_spawnable_entity_id(&source_spawnable_entity_id) {
@@ -160,8 +153,8 @@ pub fn say(
 #[spacetimedb(reducer)]
 pub fn tell(
     ctx: ReducerContext,
-    source_spawnable_entity_id: u64,
-    target_spawnable_entity_id: u64,
+    source_spawnable_entity_id: u32,
+    target_spawnable_entity_id: u32,
     chat_text: String,
 ) -> Result<(), String> {
     let source_mobile = Mobile::filter_by_spawnable_entity_id(&source_spawnable_entity_id);
@@ -193,7 +186,7 @@ pub fn tell(
 #[spacetimedb(reducer)]
 pub fn go(
     _ctx: ReducerContext,
-    source_spawnable_entity_id: u64,
+    source_spawnable_entity_id: u32,
     exit_direction: String,
 ) -> Result<(), String> {
     if let Some(location) = Location::filter_by_spawnable_entity_id(&source_spawnable_entity_id) {

@@ -27,8 +27,8 @@ export class Globals extends IDatabaseTable
 	public static getAlgebraicType(): AlgebraicType
 	{
 		return AlgebraicType.createProductType([
-			new ProductTypeElement("id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
-			new ProductTypeElement("spawnable_entity_id_counter", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
+			new ProductTypeElement("id", AlgebraicType.createPrimitiveType(BuiltinType.Type.I32)),
+			new ProductTypeElement("spawnable_entity_id_counter", AlgebraicType.createPrimitiveType(BuiltinType.Type.I32)),
 		]);
 	}
 
@@ -84,7 +84,7 @@ export class Globals extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Globals").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Globals, oldValue: Globals, reducerEvent: ReducerEvent | undefined) => void)
+	public static onDelete(callback: (value: Globals, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Globals").onDelete(callback);
 	}
@@ -99,7 +99,7 @@ export class Globals extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Globals").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Globals, oldValue: Globals, reducerEvent: ReducerEvent | undefined) => void)
+	public static removeOnDelete(callback: (value: Globals, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Globals").removeOnDelete(callback);
 	}

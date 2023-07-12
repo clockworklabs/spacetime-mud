@@ -1,7 +1,7 @@
 import threading
 import openai
 
-import spacetimedb_python_sdk.local_config as local_config
+import spacetimedb_sdk.local_config as local_config
 import json
 
 max_openai_calls_retries = 3

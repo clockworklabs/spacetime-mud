@@ -1,12 +1,12 @@
 import sys
-sys.path.insert(0,"../../spacetimedb-python-sdk/")
+sys.path.insert(0,"../../spacetimedb-python-sdk/src/")
 
 import asyncio
 from conversation import Conversation
 from global_vars import GlobalVars
 
-from spacetimedb_python_sdk.spacetimedb_async_client import SpacetimeDBAsyncClient
-import spacetimedb_python_sdk.local_config as local_config
+from spacetimedb_sdk.spacetimedb_async_client import SpacetimeDBAsyncClient
+import spacetimedb_sdk.local_config as local_config
 
 import autogen
 from autogen.player import Player
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         asyncio.run(spacetime_client.run(
                         auth_token, 
                         "localhost:3000", 
-                        "example-mud", 
+                        "spacetime-mud", 
                         False, 
                         on_connect, 
                         ["SELECT * FROM Mobile", 

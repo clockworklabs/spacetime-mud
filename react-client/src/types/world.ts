@@ -11,7 +11,7 @@ export class World extends IDatabaseTable
 	public name: string;
 	public description: string;
 
-	public static primaryKey: string | undefined = "world_id";
+	public static primaryKey: string | undefined = "worldId";
 
 	constructor(worldId: string, name: string, description: string) {
 	super();
@@ -100,7 +100,7 @@ export class World extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("World").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: World, oldValue: World, reducerEvent: ReducerEvent | undefined) => void)
+	public static onDelete(callback: (value: World, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("World").onDelete(callback);
 	}
@@ -115,7 +115,7 @@ export class World extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("World").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: World, oldValue: World, reducerEvent: ReducerEvent | undefined) => void)
+	public static removeOnDelete(callback: (value: World, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("World").removeOnDelete(callback);
 	}

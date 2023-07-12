@@ -4,10 +4,12 @@
 from __future__ import annotations
 from typing import List, Iterator, Callable
 
-from spacetimedb_python_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 
 class Player:
 	is_table_class = True
+
+	primary_key = "spawnable_entity_id"
 
 	@classmethod
 	def register_row_update(cls, callback: Callable[[str,Player,Player], None]):

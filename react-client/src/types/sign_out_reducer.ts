@@ -2,25 +2,28 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue, ReducerArgsAdapter, SumTypeVariant, Serializer } from "@clockworklabs/spacetimedb-sdk";
 
 export class SignOutReducer
 {
-	public static call(playerSpawnableEntityId: number)
+	public static call(_playerSpawnableEntityId: number)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
-			__SPACETIMEDB__.spacetimeDBClient.call("sign_out", [playerSpawnableEntityId]);
+		const serializer = __SPACETIMEDB__.spacetimeDBClient.getSerializer();
+		let _playerSpawnableEntityIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
+		serializer.write(_playerSpawnableEntityIdType, _playerSpawnableEntityId);
+			__SPACETIMEDB__.spacetimeDBClient.call("sign_out", serializer);
 		}
 	}
 
-	public static deserializeArgs(rawArgs: any[]): any[] {
-		let playerSpawnableEntityIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U64);
-		let playerSpawnableEntityIdValue = AlgebraicValue.deserialize(playerSpawnableEntityIdType, rawArgs[0])
+	public static deserializeArgs(adapter: ReducerArgsAdapter): any[] {
+		let playerSpawnableEntityIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
+		let playerSpawnableEntityIdValue = AlgebraicValue.deserialize(playerSpawnableEntityIdType, adapter.next())
 		let playerSpawnableEntityId = playerSpawnableEntityIdValue.asNumber();
 		return [playerSpawnableEntityId];
 	}
 
-	public static on(callback: (status: string, identity: string, reducerArgs: any[]) => void)
+	public static on(callback: (status: string, identity: Uint8Array, reducerArgs: any[]) => void)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
 			__SPACETIMEDB__.spacetimeDBClient.on("reducer:SignOut", callback);

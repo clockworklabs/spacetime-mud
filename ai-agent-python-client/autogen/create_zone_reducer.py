@@ -3,7 +3,7 @@
 
 from typing import List, Callable
 
-from spacetimedb_python_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 
 
 def create_zone(zone_id: str, world_id: str, zone_name: str, zone_description: str):

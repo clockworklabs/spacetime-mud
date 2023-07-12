@@ -13,7 +13,7 @@ export class RoomChat extends IDatabaseTable
 	public chatText: string;
 	public timestamp: number;
 
-	public static primaryKey: string | undefined = "chat_entity_id";
+	public static primaryKey: string | undefined = "chatEntityId";
 
 	constructor(chatEntityId: number, roomId: string, sourceSpawnableEntityId: number, chatText: string, timestamp: number) {
 	super();
@@ -33,9 +33,9 @@ export class RoomChat extends IDatabaseTable
 	public static getAlgebraicType(): AlgebraicType
 	{
 		return AlgebraicType.createProductType([
-			new ProductTypeElement("chat_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
+			new ProductTypeElement("chat_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
 			new ProductTypeElement("room_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
-			new ProductTypeElement("source_spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
+			new ProductTypeElement("source_spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
 			new ProductTypeElement("chat_text", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 			new ProductTypeElement("timestamp", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
 		]);
@@ -132,7 +132,7 @@ export class RoomChat extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("RoomChat").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: RoomChat, oldValue: RoomChat, reducerEvent: ReducerEvent | undefined) => void)
+	public static onDelete(callback: (value: RoomChat, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("RoomChat").onDelete(callback);
 	}
@@ -147,7 +147,7 @@ export class RoomChat extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("RoomChat").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: RoomChat, oldValue: RoomChat, reducerEvent: ReducerEvent | undefined) => void)
+	public static removeOnDelete(callback: (value: RoomChat, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("RoomChat").removeOnDelete(callback);
 	}

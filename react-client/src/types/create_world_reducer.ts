@@ -2,31 +2,38 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue, ReducerArgsAdapter, SumTypeVariant, Serializer } from "@clockworklabs/spacetimedb-sdk";
 
 export class CreateWorldReducer
 {
-	public static call(worldId: string, worldName: string, worldDescription: string)
+	public static call(_worldId: string, _worldName: string, _worldDescription: string)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
-			__SPACETIMEDB__.spacetimeDBClient.call("create_world", [worldId, worldName, worldDescription]);
+		const serializer = __SPACETIMEDB__.spacetimeDBClient.getSerializer();
+		let _worldIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_worldIdType, _worldId);
+		let _worldNameType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_worldNameType, _worldName);
+		let _worldDescriptionType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_worldDescriptionType, _worldDescription);
+			__SPACETIMEDB__.spacetimeDBClient.call("create_world", serializer);
 		}
 	}
 
-	public static deserializeArgs(rawArgs: any[]): any[] {
+	public static deserializeArgs(adapter: ReducerArgsAdapter): any[] {
 		let worldIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let worldIdValue = AlgebraicValue.deserialize(worldIdType, rawArgs[0])
+		let worldIdValue = AlgebraicValue.deserialize(worldIdType, adapter.next())
 		let worldId = worldIdValue.asString();
 		let worldNameType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let worldNameValue = AlgebraicValue.deserialize(worldNameType, rawArgs[1])
+		let worldNameValue = AlgebraicValue.deserialize(worldNameType, adapter.next())
 		let worldName = worldNameValue.asString();
 		let worldDescriptionType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let worldDescriptionValue = AlgebraicValue.deserialize(worldDescriptionType, rawArgs[2])
+		let worldDescriptionValue = AlgebraicValue.deserialize(worldDescriptionType, adapter.next())
 		let worldDescription = worldDescriptionValue.asString();
 		return [worldId, worldName, worldDescription];
 	}
 
-	public static on(callback: (status: string, identity: string, reducerArgs: any[]) => void)
+	public static on(callback: (status: string, identity: Uint8Array, reducerArgs: any[]) => void)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
 			__SPACETIMEDB__.spacetimeDBClient.on("reducer:CreateWorld", callback);

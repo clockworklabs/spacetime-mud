@@ -3,7 +3,7 @@
 
 from typing import List, Callable
 
-from spacetimedb_python_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 
 
 def say(source_spawnable_entity_id: int, chat_text: str):

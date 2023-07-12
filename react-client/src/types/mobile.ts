@@ -11,7 +11,7 @@ export class Mobile extends IDatabaseTable
 	public name: string;
 	public description: string;
 
-	public static primaryKey: string | undefined = "spawnable_entity_id";
+	public static primaryKey: string | undefined = "spawnableEntityId";
 
 	constructor(spawnableEntityId: number, name: string, description: string) {
 	super();
@@ -29,7 +29,7 @@ export class Mobile extends IDatabaseTable
 	public static getAlgebraicType(): AlgebraicType
 	{
 		return AlgebraicType.createProductType([
-			new ProductTypeElement("spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
+			new ProductTypeElement("spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
 			new ProductTypeElement("name", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 			new ProductTypeElement("description", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 		]);
@@ -100,7 +100,7 @@ export class Mobile extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Mobile").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Mobile, oldValue: Mobile, reducerEvent: ReducerEvent | undefined) => void)
+	public static onDelete(callback: (value: Mobile, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Mobile").onDelete(callback);
 	}
@@ -115,7 +115,7 @@ export class Mobile extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Mobile").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Mobile, oldValue: Mobile, reducerEvent: ReducerEvent | undefined) => void)
+	public static removeOnDelete(callback: (value: Mobile, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Mobile").removeOnDelete(callback);
 	}

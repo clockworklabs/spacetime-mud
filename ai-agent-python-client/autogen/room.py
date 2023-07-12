@@ -4,11 +4,13 @@
 from __future__ import annotations
 from typing import List, Iterator, Callable
 
-from spacetimedb_python_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 from .exit import Exit
 
 class Room:
 	is_table_class = True
+
+	primary_key = "room_id"
 
 	@classmethod
 	def register_row_update(cls, callback: Callable[[str,Room,Room], None]):

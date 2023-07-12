@@ -2,28 +2,33 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue, ReducerArgsAdapter, SumTypeVariant, Serializer } from "@clockworklabs/spacetimedb-sdk";
 
 export class CreatePlayerReducer
 {
-	public static call(name: string, description: string)
+	public static call(_name: string, _description: string)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
-			__SPACETIMEDB__.spacetimeDBClient.call("create_player", [name, description]);
+		const serializer = __SPACETIMEDB__.spacetimeDBClient.getSerializer();
+		let _nameType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_nameType, _name);
+		let _descriptionType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_descriptionType, _description);
+			__SPACETIMEDB__.spacetimeDBClient.call("create_player", serializer);
 		}
 	}
 
-	public static deserializeArgs(rawArgs: any[]): any[] {
+	public static deserializeArgs(adapter: ReducerArgsAdapter): any[] {
 		let nameType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let nameValue = AlgebraicValue.deserialize(nameType, rawArgs[0])
+		let nameValue = AlgebraicValue.deserialize(nameType, adapter.next())
 		let name = nameValue.asString();
 		let descriptionType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let descriptionValue = AlgebraicValue.deserialize(descriptionType, rawArgs[1])
+		let descriptionValue = AlgebraicValue.deserialize(descriptionType, adapter.next())
 		let description = descriptionValue.asString();
 		return [name, description];
 	}
 
-	public static on(callback: (status: string, identity: string, reducerArgs: any[]) => void)
+	public static on(callback: (status: string, identity: Uint8Array, reducerArgs: any[]) => void)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
 			__SPACETIMEDB__.spacetimeDBClient.on("reducer:CreatePlayer", callback);

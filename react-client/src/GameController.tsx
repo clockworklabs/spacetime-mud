@@ -14,6 +14,8 @@ import tell_reducer from './types/tell_reducer';
 import go_reducer from './types/go_reducer';
 import sign_in_reducer from './types/sign_in_reducer';
 import sign_out_reducer from './types/sign_out_reducer';
+import create_room_reducer from './types/create_room_reducer';
+import create_connection_reducer from './types/create_connection_reducer';
 console.log(Player, Mobile, Location, World, Zone, Room, RoomChat, DirectMessage);
 
 export enum GameState {
@@ -30,7 +32,7 @@ export enum Color {
 }
 
 export class GameController {
-    private readonly DBNAME = 'example-mud'; // replace with your database name
+    private readonly DBNAME = 'spacetime-mud'; // replace with your database name
 
     private client: SpacetimeDBClient;
     public gameState: GameState = GameState.CONNECTING; // Initialized to connecting state
@@ -47,7 +49,7 @@ export class GameController {
     constructor() {
         let token = localStorage.getItem('auth_token') || undefined;
         console.log("Loading Token: " + token);
-        this.client = new SpacetimeDBClient('localhost:3000', this.DBNAME, token);
+        this.client = new SpacetimeDBClient('localhost:3000', this.DBNAME, token, "binary");
         this.local_identity = new Uint8Array();
         this.local_spawnable_entity_id = 0;
     }
@@ -56,10 +58,10 @@ export class GameController {
         console.log("Initializing game controller");
         this.client.connect();
 
-        this.client.onConnect((token: string, identity: string) => {
+        this.client.onConnect((token: string, identity: Uint8Array) => {
             console.log("SpacetimeDB connected");
             console.log("Storing Token: " + token);
-            this.local_identity = (new TextEncoder()).encode(identity);
+            this.local_identity = identity;
 
             localStorage.setItem('auth_token', token);
 
@@ -76,7 +78,7 @@ export class GameController {
         });
 
         this.client.onError(() => {
-            this.on_undefined_error();
+            this.on_undefined_error("Client Error");
         })
 
         this.client.on('initialStateSync', () => {
@@ -88,9 +90,11 @@ export class GameController {
                 var mobile = Mobile.filterBySpawnableEntityId(this.local_spawnable_entity_id);
                 if (mobile) {
                     this.console_print("Welcome back " + mobile.name + ".");
+                    this.gameState = GameState.GAME;
+                    this.room();
                 }
                 else {
-                    this.on_undefined_error();
+                    this.on_undefined_error("Mobile not found.");
                 }
             }
             else {
@@ -99,10 +103,9 @@ export class GameController {
             }
         });
 
-        create_player_reducer.on((status: string, identity: string, reducerArgs: any[]) => {
-            var identity_array = (new TextEncoder()).encode(identity);
-            console.log("CreatePlayerReducer called with status: " + status + " by " + identity_array + " with args: " + reducerArgs + ". My identity: " + this.local_identity);
-            if (this.identitiesEqual(identity_array, this.local_identity) && status === "committed") {
+        create_player_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
+            console.log("CreatePlayerReducer called with status: " + status + " by " + identity + " with args: " + reducerArgs + ". My identity: " + this.local_identity);
+            if (this.identitiesEqual(identity, this.local_identity) && status === "committed") {
                 var player = Player.filterByIdentity(this.local_identity);
                 if (player) {
                     this.gameState = GameState.GAME;
@@ -112,13 +115,12 @@ export class GameController {
                     this.room();
                 }
                 else {
-                    console.log("Player not found");
-                    this.on_undefined_error();
+                    this.on_undefined_error("Player not found");
                 }
             }
         });
 
-        say_reducer.on((status: string, identity: string, reducerArgs: any[]) => {
+        say_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
             if (status === "committed") {
                 var source_spawnable_entity_id = reducerArgs[0];
                 var chat_text = reducerArgs[1];
@@ -139,7 +141,7 @@ export class GameController {
             }
         });
 
-        tell_reducer.on((status: string, identity: string, reducerArgs: any[]) => {
+        tell_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
             if (status === "committed" && reducerArgs[1] === this.local_spawnable_entity_id) {
                 const source_name = this.get_name(reducerArgs[0]);
                 this.console_print(`${source_name} tells you "${reducerArgs[2]}".\n`);
@@ -147,7 +149,7 @@ export class GameController {
             }
         });
 
-        sign_in_reducer.on((status: string, identity: string, reducerArgs: any[]) => {
+        sign_in_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
             var player_spawnable_entity_id = reducerArgs[0];
             if (status === "committed" && player_spawnable_entity_id !== this.local_spawnable_entity_id) {
                 const local_room_id = this.get_local_player_room_id();
@@ -160,7 +162,7 @@ export class GameController {
             }
         });
 
-        sign_out_reducer.on((status: string, identity: string, reducerArgs: any[]) => {
+        sign_out_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
             var player_spawnable_entity_id = reducerArgs[0];
             if (status === "committed" && player_spawnable_entity_id !== this.local_spawnable_entity_id) {
                 const local_room_id = this.get_local_player_room_id();
@@ -173,12 +175,11 @@ export class GameController {
             }
         });
 
-        go_reducer.on((status: string, identity: string, reducerArgs: any[]) => {
+        go_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
             var source_spawnable_entity_id = reducerArgs[0];
             var exit_direction = reducerArgs[1];
             if (status === "committed") {
-                var caller_identity = (new TextEncoder()).encode(identity);
-                if (this.identitiesEqual(this.local_identity, caller_identity)) {
+                if (this.identitiesEqual(this.local_identity, identity)) {
                     this.console_print(`You go ${exit_direction}.\n`);
                     this.room();
                 } else {
@@ -250,6 +251,30 @@ export class GameController {
                 } else {
                     this.console_print(`You tell ${matches[0].name} "${message}"\n`);
                     tell_reducer.call(this.local_spawnable_entity_id, matches[0].spawnableEntityId, message);
+                }
+            } else if (command.toLowerCase().startsWith("createroom ")) {
+                // first arg is direction
+                // second arg is room name (if it has multiple words it will be in quotes)
+                // third arg is room description (if it has multiple words it will be in quotes)
+                const direction = command.split(" ")[1];
+                const roomName = command.substring(command.indexOf(direction) + direction.length + 1).split("\"")[1];
+                const roomDescription = command.substring(command.indexOf(roomName) + roomName.length + 1).split("\"")[1];
+                var room = this.get_local_player_room();
+                var zone = room?.zoneId;
+                if (room && zone) {
+                    // create a mapping for every cardinal direction to its opposite
+                    var opposite_directions: { [key: string]: string } = {
+                        "north": "south",
+                        "south": "north",
+                        "east": "west",
+                        "west": "east",
+                        "up": "down",
+                        "down": "up"
+                    };
+                    // make room id the roomName with spaces replaced with _ and lowercase
+                    var roomId = roomName.replace(" ", "_").toLowerCase();
+                    create_room_reducer.call(zone, roomId, roomName, roomDescription);
+                    create_connection_reducer.call(room?.roomId, roomId, direction, opposite_directions[direction], "", "");
                 }
             } else if (exits_strs.includes(command.toLowerCase())) {
                 const index = exits_strs.indexOf(command.toLowerCase());
@@ -334,15 +359,15 @@ export class GameController {
         this.console_print("> ");
     }
 
-    public on_undefined_error(): void {
+    public on_undefined_error(errMsg: string): void {
         this.console_print("Something went wrong. Please refresh the page.");
         this.close();
-        console.log("undefined error");
+        console.log(`undefined error: ${errMsg}`);
         console.trace();
     }
 
     public identitiesEqual(a: Uint8Array, b: Uint8Array): boolean {
-        if (a.length !== b.length) { this.console_print("fail"); return false; }
+        if (a.length !== b.length) { return false; }
         for (let i = 0; i < a.length; i++) {
             if (a[i] !== b[i]) { return false; }
         }

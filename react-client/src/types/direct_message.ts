@@ -13,7 +13,7 @@ export class DirectMessage extends IDatabaseTable
 	public chatText: string;
 	public timestamp: number;
 
-	public static primaryKey: string | undefined = "whisper_entity_id";
+	public static primaryKey: string | undefined = "whisperEntityId";
 
 	constructor(whisperEntityId: number, sourceSpawnableEntityId: number, targetSpawnableEntityId: number, chatText: string, timestamp: number) {
 	super();
@@ -33,9 +33,9 @@ export class DirectMessage extends IDatabaseTable
 	public static getAlgebraicType(): AlgebraicType
 	{
 		return AlgebraicType.createProductType([
-			new ProductTypeElement("whisper_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
-			new ProductTypeElement("source_spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
-			new ProductTypeElement("target_spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
+			new ProductTypeElement("whisper_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
+			new ProductTypeElement("source_spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
+			new ProductTypeElement("target_spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
 			new ProductTypeElement("chat_text", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 			new ProductTypeElement("timestamp", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
 		]);
@@ -132,7 +132,7 @@ export class DirectMessage extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("DirectMessage").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: DirectMessage, oldValue: DirectMessage, reducerEvent: ReducerEvent | undefined) => void)
+	public static onDelete(callback: (value: DirectMessage, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("DirectMessage").onDelete(callback);
 	}
@@ -147,7 +147,7 @@ export class DirectMessage extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("DirectMessage").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: DirectMessage, oldValue: DirectMessage, reducerEvent: ReducerEvent | undefined) => void)
+	public static removeOnDelete(callback: (value: DirectMessage, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("DirectMessage").removeOnDelete(callback);
 	}

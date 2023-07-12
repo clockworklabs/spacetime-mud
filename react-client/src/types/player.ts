@@ -10,7 +10,7 @@ export class Player extends IDatabaseTable
 	public spawnableEntityId: number;
 	public identity: Uint8Array;
 
-	public static primaryKey: string | undefined = "spawnable_entity_id";
+	public static primaryKey: string | undefined = "spawnableEntityId";
 
 	constructor(spawnableEntityId: number, identity: Uint8Array) {
 	super();
@@ -27,7 +27,7 @@ export class Player extends IDatabaseTable
 	public static getAlgebraicType(): AlgebraicType
 	{
 		return AlgebraicType.createProductType([
-			new ProductTypeElement("spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
+			new ProductTypeElement("spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
 			new ProductTypeElement("identity", AlgebraicType.createArrayType(AlgebraicType.createPrimitiveType(BuiltinType.Type.U8))),
 		]);
 	}
@@ -95,7 +95,7 @@ export class Player extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Player").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Player, oldValue: Player, reducerEvent: ReducerEvent | undefined) => void)
+	public static onDelete(callback: (value: Player, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Player").onDelete(callback);
 	}
@@ -110,7 +110,7 @@ export class Player extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Player").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Player, oldValue: Player, reducerEvent: ReducerEvent | undefined) => void)
+	public static removeOnDelete(callback: (value: Player, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Player").removeOnDelete(callback);
 	}

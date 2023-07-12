@@ -3,7 +3,7 @@
 
 from typing import List, Callable
 
-from spacetimedb_python_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 
 
 def create_connection(from_room_id: str, to_room_id: str, from_direction: str, to_direction: str, from_exit_description: str, to_exit_description: str):

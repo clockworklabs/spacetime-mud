@@ -2,28 +2,33 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue, ReducerArgsAdapter, SumTypeVariant, Serializer } from "@clockworklabs/spacetimedb-sdk";
 
 export class SayReducer
 {
-	public static call(sourceSpawnableEntityId: number, chatText: string)
+	public static call(_sourceSpawnableEntityId: number, _chatText: string)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
-			__SPACETIMEDB__.spacetimeDBClient.call("say", [sourceSpawnableEntityId, chatText]);
+		const serializer = __SPACETIMEDB__.spacetimeDBClient.getSerializer();
+		let _sourceSpawnableEntityIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
+		serializer.write(_sourceSpawnableEntityIdType, _sourceSpawnableEntityId);
+		let _chatTextType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_chatTextType, _chatText);
+			__SPACETIMEDB__.spacetimeDBClient.call("say", serializer);
 		}
 	}
 
-	public static deserializeArgs(rawArgs: any[]): any[] {
-		let sourceSpawnableEntityIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U64);
-		let sourceSpawnableEntityIdValue = AlgebraicValue.deserialize(sourceSpawnableEntityIdType, rawArgs[0])
+	public static deserializeArgs(adapter: ReducerArgsAdapter): any[] {
+		let sourceSpawnableEntityIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
+		let sourceSpawnableEntityIdValue = AlgebraicValue.deserialize(sourceSpawnableEntityIdType, adapter.next())
 		let sourceSpawnableEntityId = sourceSpawnableEntityIdValue.asNumber();
 		let chatTextType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let chatTextValue = AlgebraicValue.deserialize(chatTextType, rawArgs[1])
+		let chatTextValue = AlgebraicValue.deserialize(chatTextType, adapter.next())
 		let chatText = chatTextValue.asString();
 		return [sourceSpawnableEntityId, chatText];
 	}
 
-	public static on(callback: (status: string, identity: string, reducerArgs: any[]) => void)
+	public static on(callback: (status: string, identity: Uint8Array, reducerArgs: any[]) => void)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
 			__SPACETIMEDB__.spacetimeDBClient.on("reducer:Say", callback);

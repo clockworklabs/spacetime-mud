@@ -16,6 +16,56 @@ from json_encoding import RoomEncoder
 
 from openai_harness import openai_call
 
+class Command:
+    description = "Base command, should be overridden."
+
+    def execute(self, data, prompt_info):
+        pass
+
+class CreateRoomCommand(Command):
+    def __init__(self, prompt_prefix):
+        self.prompt_prefix = prompt_prefix
+
+    description = "create_room: This command creates a new room connected to the current room."
+
+    # execute returns a tuple of (response, is_finished)
+    def execute(self, prompt_info):
+        prompt = f"{self.prompt_prefix}\n\nWorld Info: \n\n{json.dumps(prompt_info.source_world.data)}\nCurrent Room Info: \n\n{json.dumps(prompt_info.source_room.data, cls=RoomEncoder)}\n\nUser Prompt:\n\n{prompt_info.prompt}.\n\nThe user has asked you to create a room adjoining the room they are currently in. The user should have provided some information about the new room and the direction from their current room to put the exit. Make sure you use the direction indicated by the User Prompt and not the direction in the Current Room Info. If you are able to complete the request, respond in the following JSON format: {{\"room_id\": \"room_id_of_new_room\", \"room_name\": \"name_of_new_room\", \"room_description\": \"description_of_new_room\", \"source_room_exit_direction\": \"direction_from_source_room_to_new_room\", \"new_room_exit_direction\": \"direction_from_new_room_to_source_room\", \"message\": \"Friendly response to the user telling them you processed the request\"}}\n\nIf you can't reasonably complete the request, write a response to the user in a friendly tone explaining why you can not complete the request in JSON format {{ \"message\": \"Hello\" }}" 
+
+        message_json = None
+        try:
+            message_response = openai_call(prompt)
+            message_json = json.loads(message_response)
+        except Exception as e:
+            print("OpenAI Prompt Error: " + e)            
+            return ("I'm having trouble responding. Please try again.", False)
+        
+        if 'room_id' in message_json:
+            exit_direction = message_json['source_room_exit_direction']
+            if exit_direction in [exit.direction for exit in prompt_info.source_room.exits]:
+                print("OpenAI Prompt Error: Exit already exists in that direction")
+                return ("I'm having trouble responding. Please try again.", False)
+            if Room.filter_by_room_id(message_json['room_id']):
+                print("OpenAI Prompt Error: Room already exists with that ID")
+                return ("I'm having trouble responding. Please try again.", False)
+            create_room_reducer.create_room(prompt_info.source_zone.zone_id, message_json['room_id'], message_json['room_name'], message_json['room_description'])
+            create_connection_reducer.create_connection(prompt_info.source_room.room_id, message_json['room_id'], message_json['source_room_exit_direction'], message_json['new_room_exit_direction'],"","")
+            return (message_json['message'], False)
+        elif 'message' in message_json:
+            return (message_json['message'], False)
+        else:
+            print("OpenAI Prompt Error: Invalid response")
+            self.respond("I'm having trouble responding. Please try again.")
+            return ("I'm having trouble responding. Please try again.", False)
+
+class DeleteRoomCommand(Command):
+    description = "delete_room: This command deletes a specified room."
+
+    def execute(self, data, prompt_info):
+        # Do stuff specific to deleting a room
+        pass
+
+
 class PromptInfo:
     source_room: Room
     source_zone: Zone
@@ -29,6 +79,7 @@ class PromptInfo:
         self.prompt = prompt
 
 class Conversation:
+    common_prompt_prefix = "You are an AI agent that is capable of building the game world based on commands given to you by players."
     source_spawnable_entity_id: int
     prompt_queue: queue.Queue
     prompt_prefix: str
@@ -41,7 +92,12 @@ class Conversation:
         self.source_spawnable_entity_id = source_spawnable_entity_id
         self.worker_thread = threading.Thread(target=self.worker)
         self.worker_thread.start()
-        self.prompt_prefix = "You are an AI agent that is capable of building the game world based on commands given to you by players. "
+
+        self.commands = {
+            "create_room": CreateRoomCommand(self.common_prompt_prefix),
+            "delete_room": DeleteRoomCommand(),
+            # etc.
+        }
 
     def worker(self):
         while True:
@@ -49,7 +105,10 @@ class Conversation:
                 self.thinking = True
                 prompt_info = self.prompt_queue.get()
 
-                prompt = f"You are an AI agent that is capable of building the game world based on commands given to you by players. You are talking to a player inside a multi-user dungeon. Currently at this early stage of the game's development, we can only process one command called create_room which will create a room connected to the room the player is currently in. Keep your responses in character.\n\nWorld Info: {json.dumps(prompt_info.source_world.data)}\nPlayer Direct Message: {prompt_info.prompt}\n\nIf the user is asking you to do one of your supported commands, respond in the following JSON format: {{\"command\": \"command_name\"}}. Otherwise you will write a response to the user in a friendly tone in JSON format {{ \"message\": \"Hello\" }}"
+                commands_description = "\n".join([command.description for command in self.commands.values()])
+
+
+                prompt = f"You are an AI agent that is capable of building the game world based on commands given to you by players. You are talking to a player inside a multi-user dungeon. Here is a list of commands you can process:\n\n{commands_description}\n\n Keep your responses in character.\n\nWorld Info: {json.dumps(prompt_info.source_world.data)}\nPlayer Direct Message: {prompt_info.prompt}\n\nIf the user is asking you to do one of your supported commands, respond in the following JSON format: {{\"command\": \"command_name\"}}. Otherwise you will write a response to the user in a friendly tone in JSON format {{ \"message\": \"Hello\" }}"
 
                 message_json = None
                 try:
@@ -86,42 +145,16 @@ class Conversation:
 
     # this function is called from the worker thread
     def process_command(self, command: str, prompt_info: PromptInfo):
-        if command == "create_room":
-            prompt = f"{self.prompt_prefix}\n\nWorld Info: \n\n{json.dumps(prompt_info.source_world.data)}\nCurrent Room Info: \n\n{json.dumps(prompt_info.source_room.data, cls=RoomEncoder)}\n\nUser Prompt:\n\n{prompt_info.prompt}.\n\nThe user has asked you to create a room adjoining the room they are currently in. The user should have provided some information about the new room and the direction from their current room to put the exit. Make sure you use the direction indicated by the User Prompt and not the direction in the Current Room Info. If you are able to complete the request, respond in the following JSON format: {{\"room_id\": \"room_id_of_new_room\", \"room_name\": \"name_of_new_room\", \"room_description\": \"description_of_new_room\", \"source_room_exit_direction\": \"direction_from_source_room_to_new_room\", \"new_room_exit_direction\": \"direction_from_new_room_to_source_room\", \"message\": \"Friendly response to the user telling them you processed the request\"}}\n\nIf you can't reasonably complete the request, write a response to the user in a friendly tone explaining why you can not complete the request in JSON format {{ \"message\": \"Hello\" }}" 
-
-            message_json = None
-            try:
-                message_response = openai_call(prompt)
-                message_json = json.loads(message_response)
-            except Exception as e:
-                print("OpenAI Prompt Error: " + e)
-                self.respond("I'm having trouble responding. Please try again.")
-                self.thinking = False
-                return
-            
-            if 'room_id' in message_json:
-                exit_direction = message_json['source_room_exit_direction']
-                if exit_direction in [exit.direction for exit in prompt_info.source_room.exits]:
-                    print("OpenAI Prompt Error: Exit already exists in that direction")
-                    self.respond("I'm having trouble responding. Please try again.")
-                    self.thinking = False
-                    return
-                if Room.filter_by_room_id(message_json['room_id']):
-                    print("OpenAI Prompt Error: Room already exists with that ID")
-                    self.respond("I'm having trouble responding. Please try again.")
-                    self.thinking = False
-                    return
-                create_room_reducer.create_room(prompt_info.source_zone.zone_id, message_json['room_id'], message_json['room_name'], message_json['room_description'])
-                create_connection_reducer.create_connection(prompt_info.source_room.room_id, message_json['room_id'], message_json['source_room_exit_direction'], message_json['new_room_exit_direction'],"","")
-                self.respond(message_json['message'])
-                self.thinking = False
-            elif 'message' in message_json:
-                self.respond(message_json['message'])
-                self.thinking = False
-            else:
-                print("OpenAI Prompt Error: Invalid response")
-                self.respond("I'm having trouble responding. Please try again.")
-                self.thinking = False
+        if command in self.commands:
+            response, still_thinking = self.commands[command].execute(prompt_info)
+            if response is not None:
+                self.respond(response)
+            if still_thinking is not None:
+                self.thinking = still_thinking
+        else:
+            print("OpenAI Prompt Error: Invalid command")
+            self.respond("I'm having trouble responding. Please try again.")
+            self.thinking = False            
 
     def respond(self, message):
         tell_reducer.tell(GlobalVars.local_spawnable_entity_id, self.source_spawnable_entity_id, message)

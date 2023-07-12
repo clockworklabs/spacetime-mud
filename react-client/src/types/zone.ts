@@ -13,7 +13,7 @@ export class Zone extends IDatabaseTable
 	public description: string;
 	public connectingZones: string[];
 
-	public static primaryKey: string | undefined = "zone_id";
+	public static primaryKey: string | undefined = "zoneId";
 
 	constructor(zoneId: string, worldId: string, name: string, description: string, connectingZones: string[]) {
 	super();
@@ -121,7 +121,7 @@ export class Zone extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Zone").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Zone, oldValue: Zone, reducerEvent: ReducerEvent | undefined) => void)
+	public static onDelete(callback: (value: Zone, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Zone").onDelete(callback);
 	}
@@ -136,7 +136,7 @@ export class Zone extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Zone").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Zone, oldValue: Zone, reducerEvent: ReducerEvent | undefined) => void)
+	public static removeOnDelete(callback: (value: Zone, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Zone").removeOnDelete(callback);
 	}

@@ -11,7 +11,7 @@ export class Location extends IDatabaseTable
 	public roomId: string | null;
 	public lastRoomId: string | null;
 
-	public static primaryKey: string | undefined = "spawnable_entity_id";
+	public static primaryKey: string | undefined = "spawnableEntityId";
 
 	constructor(spawnableEntityId: number, roomId: string | null, lastRoomId: string | null) {
 	super();
@@ -29,7 +29,7 @@ export class Location extends IDatabaseTable
 	public static getAlgebraicType(): AlgebraicType
 	{
 		return AlgebraicType.createProductType([
-			new ProductTypeElement("spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U64)),
+			new ProductTypeElement("spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
 			new ProductTypeElement("room_id", AlgebraicType.createSumType([
 			new SumTypeVariant("some", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 			new SumTypeVariant("none", AlgebraicType.createProductType([
@@ -84,7 +84,7 @@ export class Location extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Location").onUpdate(callback);
 	}
 
-	public static onDelete(callback: (value: Location, oldValue: Location, reducerEvent: ReducerEvent | undefined) => void)
+	public static onDelete(callback: (value: Location, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Location").onDelete(callback);
 	}
@@ -99,7 +99,7 @@ export class Location extends IDatabaseTable
 		__SPACETIMEDB__.clientDB.getTable("Location").removeOnUpdate(callback);
 	}
 
-	public static removeOnDelete(callback: (value: Location, oldValue: Location, reducerEvent: ReducerEvent | undefined) => void)
+	public static removeOnDelete(callback: (value: Location, reducerEvent: ReducerEvent | undefined) => void)
 	{
 		__SPACETIMEDB__.clientDB.getTable("Location").removeOnDelete(callback);
 	}

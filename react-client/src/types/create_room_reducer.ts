@@ -2,34 +2,43 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, IDatabaseTable, AlgebraicValue, ReducerArgsAdapter, SumTypeVariant, Serializer } from "@clockworklabs/spacetimedb-sdk";
 
 export class CreateRoomReducer
 {
-	public static call(zoneId: string, roomId: string, name: string, description: string)
+	public static call(_zoneId: string, _roomId: string, _name: string, _description: string)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
-			__SPACETIMEDB__.spacetimeDBClient.call("create_room", [zoneId, roomId, name, description]);
+		const serializer = __SPACETIMEDB__.spacetimeDBClient.getSerializer();
+		let _zoneIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_zoneIdType, _zoneId);
+		let _roomIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_roomIdType, _roomId);
+		let _nameType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_nameType, _name);
+		let _descriptionType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_descriptionType, _description);
+			__SPACETIMEDB__.spacetimeDBClient.call("create_room", serializer);
 		}
 	}
 
-	public static deserializeArgs(rawArgs: any[]): any[] {
+	public static deserializeArgs(adapter: ReducerArgsAdapter): any[] {
 		let zoneIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let zoneIdValue = AlgebraicValue.deserialize(zoneIdType, rawArgs[0])
+		let zoneIdValue = AlgebraicValue.deserialize(zoneIdType, adapter.next())
 		let zoneId = zoneIdValue.asString();
 		let roomIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let roomIdValue = AlgebraicValue.deserialize(roomIdType, rawArgs[1])
+		let roomIdValue = AlgebraicValue.deserialize(roomIdType, adapter.next())
 		let roomId = roomIdValue.asString();
 		let nameType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let nameValue = AlgebraicValue.deserialize(nameType, rawArgs[2])
+		let nameValue = AlgebraicValue.deserialize(nameType, adapter.next())
 		let name = nameValue.asString();
 		let descriptionType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let descriptionValue = AlgebraicValue.deserialize(descriptionType, rawArgs[3])
+		let descriptionValue = AlgebraicValue.deserialize(descriptionType, adapter.next())
 		let description = descriptionValue.asString();
 		return [zoneId, roomId, name, description];
 	}
 
-	public static on(callback: (status: string, identity: string, reducerArgs: any[]) => void)
+	public static on(callback: (status: string, identity: Uint8Array, reducerArgs: any[]) => void)
 	{
 		if (__SPACETIMEDB__.spacetimeDBClient) {
 			__SPACETIMEDB__.spacetimeDBClient.on("reducer:CreateRoom", callback);

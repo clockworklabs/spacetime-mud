@@ -3,7 +3,7 @@
 
 from typing import List, Callable
 
-from spacetimedb_python_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 
 
 def sign_in(player_spawnable_entity_id: int):
