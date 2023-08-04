@@ -2,17 +2,17 @@
 // WILL NOT BE SAVED. MODIFY TABLES IN RUST INSTEAD.
 
 // @ts-ignore
-import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
+import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, IDatabaseTable, AlgebraicValue, ReducerEvent, Identity } from "@clockworklabs/spacetimedb-sdk";
 
 export class Player extends IDatabaseTable
 {
 	public static tableName = "Player";
 	public spawnableEntityId: number;
-	public identity: Uint8Array;
+	public identity: Identity;
 
 	public static primaryKey: string | undefined = "spawnableEntityId";
 
-	constructor(spawnableEntityId: number, identity: Uint8Array) {
+	constructor(spawnableEntityId: number, identity: Identity) {
 	super();
 		this.spawnableEntityId = spawnableEntityId;
 		this.identity = identity;
@@ -20,7 +20,7 @@ export class Player extends IDatabaseTable
 
 	public static serialize(value: Player): object {
 		return [
-		value.spawnableEntityId, Array.from(value.identity)
+		value.spawnableEntityId, Array.from(value.identity.toUint8Array())
 		];
 	}
 
@@ -28,7 +28,9 @@ export class Player extends IDatabaseTable
 	{
 		return AlgebraicType.createProductType([
 			new ProductTypeElement("spawnable_entity_id", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
-			new ProductTypeElement("identity", AlgebraicType.createArrayType(AlgebraicType.createPrimitiveType(BuiltinType.Type.U8))),
+			new ProductTypeElement("identity", AlgebraicType.createProductType([
+			new ProductTypeElement("__identity_bytes", AlgebraicType.createArrayType(AlgebraicType.createPrimitiveType(BuiltinType.Type.U8))),
+		])),
 		]);
 	}
 
@@ -36,7 +38,7 @@ export class Player extends IDatabaseTable
 	{
 		let productValue = value.asProductValue();
 		let __spawnable_entity_id = productValue.elements[0].asNumber();
-		let __identity = productValue.elements[1].asBytes();
+		let __identity = new Identity(productValue.elements[1].asProductValue().elements[0].asBytes());
 		return new this(__spawnable_entity_id, __identity);
 	}
 
@@ -61,23 +63,11 @@ export class Player extends IDatabaseTable
 		return null;
 	}
 
-	public static filterByIdentity(value: Uint8Array): Player | null
+	public static filterByIdentity(value: Identity): Player | null
 	{
 		for(let instance of __SPACETIMEDB__.clientDB.getTable("Player").getInstances())
 		{
-			let byteArrayCompare = function (a1: Uint8Array, a2: Uint8Array)
-			{
-			    if (a1.length !== a2.length)
-			        return false;
-
-			    for (let i=0; i<a1.length; i++)
-			        if (a1[i]!==a2[i])
-			            return false;
-
-			    return true;
-			}
-
-			if (byteArrayCompare(instance.identity, value)) {
+			if (instance.identity.isEqual(value)) {
 				return instance;
 			}
 		}
