@@ -1,4 +1,4 @@
-import { ReducerEvent, SpacetimeDBClient } from '@clockworklabs/spacetimedb-sdk';
+import { ReducerEvent, SpacetimeDBClient, Identity } from '@clockworklabs/spacetimedb-sdk';
 
 import Player from "./types/player";
 import Mobile from "./types/mobile";
@@ -37,7 +37,7 @@ export class GameController {
     private client: SpacetimeDBClient;
     public gameState: GameState = GameState.CONNECTING; // Initialized to connecting state
 
-    private local_identity: Uint8Array;
+    private local_identity: Identity | undefined;
     private local_spawnable_entity_id: number;
 
     private setConsole: (value: ((prevState: JSX.Element[]) => JSX.Element[]) | JSX.Element[]) => void = () => { };
@@ -49,8 +49,8 @@ export class GameController {
     constructor() {
         let token = localStorage.getItem('auth_token') || undefined;
         console.log("Loading Token: " + token);
-        this.client = new SpacetimeDBClient('localhost:3000', this.DBNAME, token, "binary");
-        this.local_identity = new Uint8Array();
+        this.client = new SpacetimeDBClient('wss://testnet.spacetimedb.com', this.DBNAME, token, "binary");
+        this.local_identity = undefined;
         this.local_spawnable_entity_id = 0;
     }
 
@@ -58,7 +58,7 @@ export class GameController {
         console.log("Initializing game controller");
         this.client.connect();
 
-        this.client.onConnect((token: string, identity: Uint8Array) => {
+        this.client.onConnect((token: string, identity: Identity) => {
             console.log("SpacetimeDB connected");
             console.log("Storing Token: " + token);
             this.local_identity = identity;
@@ -83,7 +83,7 @@ export class GameController {
 
         this.client.on('initialStateSync', () => {
             console.log("SpacetimeDB Initial state sync, player count: " + Player.count());
-            var player = Player.filterByIdentity(this.local_identity);
+            var player = Player.filterByIdentity(this.local_identity!);
             if (player) {
                 this.gameState = GameState.GAME;
                 this.local_spawnable_entity_id = player.spawnableEntityId;
@@ -103,10 +103,10 @@ export class GameController {
             }
         });
 
-        create_player_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
-            console.log("CreatePlayerReducer called with status: " + status + " by " + identity + " with args: " + reducerArgs + ". My identity: " + this.local_identity);
-            if (this.identitiesEqual(identity, this.local_identity) && status === "committed") {
-                var player = Player.filterByIdentity(this.local_identity);
+        create_player_reducer.on((reducerEvent: ReducerEvent, reducerArgs: any[]) => {
+            console.log("CreatePlayerReducer called with status: " + reducerEvent.status + " by " + reducerEvent.callerIdentity + " with args: " + reducerArgs + ". My identity: " + this.local_identity);
+            if (reducerEvent.callerIdentity.isEqual(this.local_identity!) && reducerEvent.status === "committed") {
+                var player = Player.filterByIdentity(this.local_identity!);
                 if (player) {
                     this.gameState = GameState.GAME;
                     this.local_spawnable_entity_id = player?.spawnableEntityId;
@@ -120,8 +120,8 @@ export class GameController {
             }
         });
 
-        say_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
-            if (status === "committed") {
+        say_reducer.on((reducerEvent: ReducerEvent, reducerArgs: any[]) => {
+            if (reducerEvent.status === "committed") {
                 var source_spawnable_entity_id = reducerArgs[0];
                 var chat_text = reducerArgs[1];
 
@@ -141,17 +141,17 @@ export class GameController {
             }
         });
 
-        tell_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
-            if (status === "committed" && reducerArgs[1] === this.local_spawnable_entity_id) {
+        tell_reducer.on((reducerEvent: ReducerEvent, reducerArgs: any[]) => {
+            if (reducerEvent.status === "committed" && reducerArgs[1] === this.local_spawnable_entity_id) {
                 const source_name = this.get_name(reducerArgs[0]);
                 this.console_print(`${source_name} tells you "${reducerArgs[2]}".\n`);
                 this.prompt();
             }
         });
 
-        sign_in_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
+        sign_in_reducer.on((reducerEvent: ReducerEvent, reducerArgs: any[]) => {
             var player_spawnable_entity_id = reducerArgs[0];
-            if (status === "committed" && player_spawnable_entity_id !== this.local_spawnable_entity_id) {
+            if (reducerEvent.status === "committed" && player_spawnable_entity_id !== this.local_spawnable_entity_id) {
                 const local_room_id = this.get_local_player_room_id();
                 const source_location = Location.filterBySpawnableEntityId(player_spawnable_entity_id);
                 if (local_room_id === source_location?.roomId) {
@@ -162,9 +162,9 @@ export class GameController {
             }
         });
 
-        sign_out_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
+        sign_out_reducer.on((reducerEvent: ReducerEvent, reducerArgs: any[]) => {
             var player_spawnable_entity_id = reducerArgs[0];
-            if (status === "committed" && player_spawnable_entity_id !== this.local_spawnable_entity_id) {
+            if (reducerEvent.status === "committed" && player_spawnable_entity_id !== this.local_spawnable_entity_id) {
                 const local_room_id = this.get_local_player_room_id();
                 const source_location = Location.filterBySpawnableEntityId(player_spawnable_entity_id);
                 if (local_room_id === source_location?.lastRoomId) {
@@ -175,11 +175,11 @@ export class GameController {
             }
         });
 
-        go_reducer.on((status: string, identity: Uint8Array, reducerArgs: any[]) => {
+        go_reducer.on((reducerEvent: ReducerEvent, reducerArgs: any[]) => {
             var source_spawnable_entity_id = reducerArgs[0];
             var exit_direction = reducerArgs[1];
-            if (status === "committed") {
-                if (this.identitiesEqual(this.local_identity, identity)) {
+            if (reducerEvent.status === "committed") {
+                if (reducerEvent.callerIdentity.isEqual(this.local_identity!)) {
                     this.console_print(`You go ${exit_direction}.\n`);
                     this.room();
                 } else {
@@ -239,7 +239,7 @@ export class GameController {
                 const prefix = "tell ";
                 const targetName = command.substring(prefix.length).split(" ")[0];
                 const message = command.substring(command.indexOf(targetName) + targetName.length + 1);
-                const matches = Array.from(Mobile.all()).filter(m => m.name.startsWith(targetName));
+                const matches = Array.from(Mobile.all()).filter(m => m.name.toLowerCase().startsWith(targetName.toLowerCase()));
                 if (matches.length !== 1) {
                     if (matches.length === 0) {
                         this.console_print(`${targetName} is not online.\n`);

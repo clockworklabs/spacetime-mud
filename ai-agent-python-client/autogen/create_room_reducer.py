@@ -4,6 +4,7 @@
 from typing import List, Callable
 
 from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import Identity
 
 
 def create_room(zone_id: str, room_id: str, name: str, description: str):
@@ -13,17 +14,8 @@ def create_room(zone_id: str, room_id: str, name: str, description: str):
 	description = description
 	SpacetimeDBClient.instance._reducer_call("create_room", zone_id, room_id, name, description)
 
-def register_on_create_room(callback: Callable[[bytes, str, str, str, str, str, str], None]):
-	if not _check_callback_signature(callback):
-		raise ValueError("Callback signature does not match expected arguments")
-
+def register_on_create_room(callback: Callable[[Identity, str, str, str, str, str, str], None]):
 	SpacetimeDBClient.instance._register_reducer("create_room", callback)
 
 def _decode_args(data):
 	return [str(data[0]), str(data[1]), str(data[2]), str(data[3])]
-
-def _check_callback_signature(callback: Callable) -> bool:
-	expected_arguments = [bytes, str, str, str, str, str, str]
-	callback_arguments = callback.__annotations__.values()
-
-	return list(callback_arguments) == expected_arguments

@@ -4,7 +4,8 @@
 from __future__ import annotations
 from typing import List, Iterator, Callable
 
-from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient, Identity
+from spacetimedb_sdk.spacetimedb_client import ReducerEvent
 
 class DirectMessage:
 	is_table_class = True
@@ -12,7 +13,7 @@ class DirectMessage:
 	primary_key = "whisper_entity_id"
 
 	@classmethod
-	def register_row_update(cls, callback: Callable[[str,DirectMessage,DirectMessage], None]):
+	def register_row_update(cls, callback: Callable[[str,DirectMessage,DirectMessage,ReducerEvent], None]):
 		SpacetimeDBClient.instance._register_row_update("DirectMessage",callback)
 
 	@classmethod

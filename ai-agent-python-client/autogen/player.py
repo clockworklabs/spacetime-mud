@@ -4,7 +4,8 @@
 from __future__ import annotations
 from typing import List, Iterator, Callable
 
-from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient, Identity
+from spacetimedb_sdk.spacetimedb_client import ReducerEvent
 
 class Player:
 	is_table_class = True
@@ -12,7 +13,7 @@ class Player:
 	primary_key = "spawnable_entity_id"
 
 	@classmethod
-	def register_row_update(cls, callback: Callable[[str,Player,Player], None]):
+	def register_row_update(cls, callback: Callable[[str,Player,Player,ReducerEvent], None]):
 		SpacetimeDBClient.instance._register_row_update("Player",callback)
 
 	@classmethod
@@ -30,7 +31,7 @@ class Player:
 	def __init__(self, data: List[object]):
 		self.data = {}
 		self.data["spawnable_entity_id"] = int(data[0])
-		self.data["identity"] = bytes.fromhex(data[1])
+		self.data["identity"] = Identity.from_string(data[1][0])
 
 	def encode(self) -> List[object]:
 		return [self.spawnable_entity_id, self.identity]

@@ -4,7 +4,8 @@
 from __future__ import annotations
 from typing import List, Iterator, Callable
 
-from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient, Identity
+from spacetimedb_sdk.spacetimedb_client import ReducerEvent
 
 class RoomChat:
 	is_table_class = True
@@ -12,7 +13,7 @@ class RoomChat:
 	primary_key = "chat_entity_id"
 
 	@classmethod
-	def register_row_update(cls, callback: Callable[[str,RoomChat,RoomChat], None]):
+	def register_row_update(cls, callback: Callable[[str,RoomChat,RoomChat,ReducerEvent], None]):
 		SpacetimeDBClient.instance._register_row_update("RoomChat",callback)
 
 	@classmethod
