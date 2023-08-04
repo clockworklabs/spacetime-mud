@@ -203,12 +203,45 @@ export class GameController {
         this.client.disconnect();
     }
 
-    public console_print(message: string, color: string | null = null): void {
-        const outputElement = color !== null ? (
-            <span style={{ color }}>{message}</span>
-        ) : (
-            message
-        );
+    public console_print(message: string, defaultColor: string = "white"): void {
+        const colorTagRegex = /\[([A-Fa-f0-9]{6})\](.*?)\[-\]/g;
+
+        // Prepare an empty parts array
+        const parts = [];
+        let match;
+
+        let lastIndex = 0;
+        while ((match = colorTagRegex.exec(message)) !== null) {
+            const color = '#' + match[1];
+            const text = match[2];
+
+            // If there is text before the match, push it as a part with the default color
+            if (match.index > lastIndex) {
+                parts.push({
+                    color: defaultColor,
+                    text: message.substring(lastIndex, match.index)
+                });
+            }
+
+            // Push the matched text with its color
+            parts.push({
+                color,
+                text
+            });
+
+            lastIndex = colorTagRegex.lastIndex;
+        }
+
+        // If there is text after the last match, push it as a part with the default color
+        if (lastIndex < message.length) {
+            parts.push({
+                color: defaultColor,
+                text: message.substring(lastIndex)
+            });
+        }
+
+        // Map over parts to create JSX elements
+        const outputElement = parts.map((part, index) => <span key={index} style={{ color: part.color }}>{part.text}</span>);
 
         this.setConsole((prev) => [...prev, <p>{outputElement}</p>]);
     }
@@ -227,8 +260,27 @@ export class GameController {
                 exits_strs = this.getExitsStrs(room);
             }
 
-            if (command.toLowerCase() === "quit" || command.toLowerCase() === "q") {
-                //this.result = "quit";
+            if (command.toLowerCase() === "help") {
+                this.console_print("Welcome to our interactive game world! Here are some basic commands to help you get started:");
+                this.console_print("");
+                this.console_print("[66ccff]Commands[-]");
+                this.console_print("");
+                this.console_print("[0099ff]<exit direction>[-] - To move around in this world, simply enter the direction you wish to travel in. Directions could be 'north', 'south', 'east', 'west', 'up', or 'down'. For example, if you want to move north, just type 'north'.");
+                this.console_print("");
+                this.console_print("[0099ff]say[-] - If there are other players in the same room as you, you can communicate with them using the 'say' command followed by your message. For example, 'say Hello, everyone!'. This will broadcast your message to all players in the room.");
+                this.console_print("");
+                this.console_print("[0099ff]tell[-] - To send a direct message to a specific player, you can use the 'tell' command followed by the player's name and then the message. For example, 'tell John Hi John, how are you?'.");
+                this.console_print("");
+                this.console_print("[66ccff]AIAgent[-]");
+                this.console_print("");
+                this.console_print("The AIAgent is a unique, AI-powered entity within our game world, capable of expanding the environment and adding characters. You communicate with the AIAgent using the 'tell' command. Here are some examples of how you can interact with the AIAgent:");
+                this.console_print("");
+                this.console_print("[0099ff]tell aiagent create room[-] - Request the AIAgent to create a new room that connects to the room you are currently in. Specify details about the room and its relative location. For instance, 'tell AIagent create a new room to the north with a sunny beach theme'.");
+                this.console_print("");
+                this.console_print("[0099ff]tell aiagent create npc[-] - Direct the AIAgent to create a Non-Player Character (NPC) in the room you are currently in. Include details such as the NPC's name, description, and location. Example: 'tell AIagent create npc named Guard who protects the castle entrance'.");
+                this.console_print("");
+                this.console_print("Remember, our world is interactive and ever-changing. Feel free to explore and enjoy the game. For any more help, don't hesitate to use the 'help' command anytime. Happy gaming!");
+                this.prompt();
             } else if (command.toLowerCase() === "look" || command.toLowerCase() === "l") {
                 this.room();
             } else if (command.toLowerCase().startsWith("say ") || command.toLowerCase().startsWith("'")) {
@@ -276,8 +328,8 @@ export class GameController {
                     create_room_reducer.call(zone, roomId, roomName, roomDescription);
                     create_connection_reducer.call(room?.roomId, roomId, direction, opposite_directions[direction], "", "");
                 }
-            } else if (exits_strs.includes(command.toLowerCase())) {
-                const index = exits_strs.indexOf(command.toLowerCase());
+            } else if (exits_strs.find((exit) => exit.startsWith(command.toLowerCase()))) {
+                const index = exits_strs.findIndex((exit) => exit.startsWith(command.toLowerCase()));
                 var exit = room?.exits[index]
                 /* Go in a direction */
                 if (exit) {

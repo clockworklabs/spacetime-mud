@@ -6,12 +6,14 @@ from autogen.location import Location
 from autogen.room import Room
 from autogen.world import World
 from autogen.zone import Zone
+from autogen.mobile import Mobile
 
 from global_vars import GlobalVars
 
 import autogen.tell_reducer as tell_reducer
 import autogen.create_room_reducer as create_room_reducer
 import autogen.create_connection_reducer as create_connection_reducer
+import autogen.create_npc_reducer as create_npc_reducer
 from json_encoding import RoomEncoder 
 
 from openai_harness import openai_call
@@ -30,7 +32,7 @@ class CreateRoomCommand(Command):
 
     # execute returns a tuple of (response, is_finished)
     def execute(self, prompt_info):
-        prompt = f"{self.prompt_prefix}\n\nWorld Info: \n\n{json.dumps(prompt_info.source_world.data)}\nCurrent Room Info: \n\n{json.dumps(prompt_info.source_room.data, cls=RoomEncoder)}\n\nUser Prompt:\n\n{prompt_info.prompt}.\n\nThe user has asked you to create a room adjoining the room they are currently in. The user should have provided some information about the new room and the direction from their current room to put the exit. Make sure you use the direction indicated by the User Prompt and not the direction in the Current Room Info. If you are able to complete the request, respond in the following JSON format: {{\"room_id\": \"room_id_of_new_room\", \"room_name\": \"name_of_new_room\", \"room_description\": \"description_of_new_room\", \"source_room_exit_direction\": \"direction_from_source_room_to_new_room\", \"new_room_exit_direction\": \"direction_from_new_room_to_source_room\", \"message\": \"Friendly response to the user telling them you processed the request\"}}\n\nIf you can't reasonably complete the request, write a response to the user in a friendly tone explaining why you can not complete the request in JSON format {{ \"message\": \"Hello\" }}" 
+        prompt = f"{self.prompt_prefix}\n\nWorld Info: \n\n{json.dumps(prompt_info.source_world.data)}\nCurrent Room Info: \n\n{json.dumps(prompt_info.source_room.data, cls=RoomEncoder)}\n\nUser Prompt:\n\n{prompt_info.prompt}.\n\nInstructions: The user has asked you to create a room adjoining the room they are currently in. They should indicate the exit direction of this room. If you are able to complete the request, respond in the following JSON format: {{\"room_id\": \"room_id_of_new_room\", \"room_name\": \"name_of_new_room\", \"room_description\": \"description_of_new_room\", \"source_room_exit_direction\": \"direction requested by the user\", \"new_room_exit_direction\": \"opposite direction\", \"message\": \"Friendly response to the user telling them you processed the request\"}}\n\nIf you can't reasonably complete the request, write a response to the user in a friendly tone explaining why you can not complete the request in JSON format {{ \"message\": \"Hello\" }}" 
 
         message_json = None
         try:
@@ -64,6 +66,24 @@ class DeleteRoomCommand(Command):
     def execute(self, data, prompt_info):
         # Do stuff specific to deleting a room
         pass
+
+class CreateNPCCommand(Command):
+    description = "create_npc: This command creates a new NPC in the current room."
+
+    def execute(self, data, prompt_info):
+        prompt = f"{self.prompt_prefix}\n\nWorld Info: \n\n{json.dumps(prompt_info.source_world.data)}\nCurrent Room Info: \n\n{json.dumps(prompt_info.source_room.data, cls=RoomEncoder)}\n\nUser Prompt:\n\n{prompt_info.prompt}.\n\nInstructions: The user has asked you to create an NPC in the room they are currently in. If you are able to complete the request, respond in the following JSON format: {{\"npc_id\": \"npc_id_of_new_npc\", \"npc_name\": \"name_of_new_npc\", \"npc_description\": \"description when you look at npc\", \"npc_biography\": \"a short biography of this npc including appearance that can be used for generating this npc's dialogue\", \"message\": \"Friendly response to the user telling them you processed the request\"}}\n\nIf you can't reasonably complete the request, write a response to the user in a friendly tone explaining why you can not complete the request in JSON format {{ \"message\": \"Hello\" }}"
+
+        message_json = None
+        try:
+            message_response = openai_call(prompt)
+            message_json = json.loads(message_response)
+        except Exception as e:
+            print("OpenAI Prompt Error: " + e)            
+            return ("I'm having trouble responding. Please try again.", False)
+        
+        if 'npc_id' in message_json:            
+            create_npc_reducer.create_npc(prompt_info.source_zone.zone_id, message_json['npc_id'], message_json['npc_name'], message_json['npc_description'])
+            return (message_json['message'], False)
 
 
 class PromptInfo:

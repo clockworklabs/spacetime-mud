@@ -1,6 +1,4 @@
 import sys
-sys.path.insert(0,"../../spacetimedb-python-sdk/src/")
-
 import asyncio
 from conversation import Conversation
 from global_vars import GlobalVars
@@ -14,6 +12,8 @@ from autogen.player import Player
 from autogen.mobile import Mobile
 import autogen.create_player_reducer as create_player_reducer
 import autogen.tell_reducer as tell_reducer
+import autogen.say_reducer as say_reducer
+from openai_harness import openai_call
 
 # check to see if the user specified an openai key
 default_open_ai_key = None
@@ -68,13 +68,22 @@ def on_subscription_applied():
 
 spacetime_client.client.register_on_subscription_applied(on_subscription_applied)
 
+def tick():
+    prompt = "You are an AI agent that is capable of building the game world based on commands given to you by players. Every once in a while we want to say something in the room we are in. Say something now welcoming new players and letting them know about the help command."
+    message_response = openai_call(prompt)
+    say_reducer.say(GlobalVars.local_spawnable_entity_id, message_response)
+
+    spacetime_client.schedule_event(50, tick)
+
+spacetime_client.schedule_event(50, tick)
+
 if __name__ == "__main__":
     try:
         asyncio.run(spacetime_client.run(
                         auth_token, 
-                        "localhost:3000", 
+                        "testnet.spacetimedb.com", 
                         "spacetime-mud", 
-                        False, 
+                        True, 
                         on_connect, 
                         ["SELECT * FROM Mobile", 
                         "SELECT * FROM Player", 
