@@ -28,6 +28,12 @@ pub struct Player {
     pub identity: Identity,
 }
 
+#[spacetimedb(table)]
+pub struct Npc {
+    #[primarykey]
+    pub spawnable_entity_id: u64,
+}
+
 #[derive(Clone)]
 #[spacetimedb(table)]
 pub struct Room {

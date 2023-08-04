@@ -123,6 +123,31 @@ pub fn create_player(ctx: ReducerContext, name: String, description: String) -> 
 }
 
 #[spacetimedb(reducer)]
+pub fn create_npc(
+    _ctx: ReducerContext,
+    room_id: String,
+    name: String,
+    description: String,
+) -> Result<(), String> {
+    let result = Location::insert(Location {
+        spawnable_entity_id: 0,
+        room_id: Some(room_id),
+        last_room_id: None,
+    })
+    .unwrap();
+
+    let spawnable_entity_id = result.spawnable_entity_id;
+    Mobile::insert(Mobile {
+        spawnable_entity_id: spawnable_entity_id,
+        name,
+        description,
+    })
+    .unwrap();
+
+    Ok(())
+}
+
+#[spacetimedb(reducer)]
 pub fn say(
     ctx: ReducerContext,
     source_spawnable_entity_id: u32,
