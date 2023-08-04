@@ -4,7 +4,8 @@
 from __future__ import annotations
 from typing import List, Iterator, Callable
 
-from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient, Identity
+from spacetimedb_sdk.spacetimedb_client import ReducerEvent
 from .exit import Exit
 
 class Room:
@@ -13,7 +14,7 @@ class Room:
 	primary_key = "room_id"
 
 	@classmethod
-	def register_row_update(cls, callback: Callable[[str,Room,Room], None]):
+	def register_row_update(cls, callback: Callable[[str,Room,Room,ReducerEvent], None]):
 		SpacetimeDBClient.instance._register_row_update("Room",callback)
 
 	@classmethod

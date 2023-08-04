@@ -4,7 +4,8 @@
 from __future__ import annotations
 from typing import List, Iterator, Callable
 
-from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient, Identity
+from spacetimedb_sdk.spacetimedb_client import ReducerEvent
 
 class Zone:
 	is_table_class = True
@@ -12,7 +13,7 @@ class Zone:
 	primary_key = "zone_id"
 
 	@classmethod
-	def register_row_update(cls, callback: Callable[[str,Zone,Zone], None]):
+	def register_row_update(cls, callback: Callable[[str,Zone,Zone,ReducerEvent], None]):
 		SpacetimeDBClient.instance._register_row_update("Zone",callback)
 
 	@classmethod
@@ -34,6 +35,10 @@ class Zone:
 	@classmethod
 	def filter_by_description(cls, description) -> List[Zone]:
 		return [column_value for column_value in SpacetimeDBClient.instance._get_table_cache("Zone").values() if column_value.description == description]
+
+	@classmethod
+	def filter_by_connecting_zones(cls, connecting_zones) -> List[Zone]:
+		return [column_value for column_value in SpacetimeDBClient.instance._get_table_cache("Zone").values() if column_value.connecting_zones == connecting_zones]
 
 	def __init__(self, data: List[object]):
 		self.data = {}

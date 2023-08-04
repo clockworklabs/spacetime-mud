@@ -6,6 +6,7 @@ from conversation import Conversation
 from global_vars import GlobalVars
 
 from spacetimedb_sdk.spacetimedb_async_client import SpacetimeDBAsyncClient
+from spacetimedb_sdk.spacetimedb_client import Identity
 import spacetimedb_sdk.local_config as local_config
 
 import autogen
@@ -34,7 +35,7 @@ def on_connect(auth_token,identity):
     GlobalVars.local_identity = identity
     print(f"Connected.")    
     
-def on_player_created(caller: bytes, status: str, message: str, name: str, description: str):
+def on_player_created(caller: Identity, status: str, message: str, name: str, description: str):
     global logged_in
 
     if caller == GlobalVars.local_identity and status == "committed":
@@ -43,7 +44,7 @@ def on_player_created(caller: bytes, status: str, message: str, name: str, descr
         logged_in = True
         # todo: unregister callback when we have autogen functions for it
                 
-def on_tell(caller: bytes, status: str, message: str, source_entity_id: int, target_entity_id: int, tell_message: str):
+def on_tell(caller: Identity, status: str, message: str, source_entity_id: int, target_entity_id: int, tell_message: str):
     if status == "committed" and target_entity_id == GlobalVars.local_spawnable_entity_id:
         if source_entity_id not in conversations:
             conversations[source_entity_id] = Conversation(source_entity_id)
@@ -63,7 +64,7 @@ def on_subscription_applied():
         print(f"Creating player")
         
         create_player_reducer.register_on_create_player(on_player_created)
-        create_player_reducer.create_player("AIAgent", "")
+        create_player_reducer.create_player("AIAgent", "An AI Agent")
 
 spacetime_client.client.register_on_subscription_applied(on_subscription_applied)
 

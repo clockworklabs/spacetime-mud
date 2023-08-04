@@ -4,6 +4,7 @@
 from typing import List, Callable
 
 from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
+from spacetimedb_sdk.spacetimedb_client import Identity
 
 
 def say(source_spawnable_entity_id: int, chat_text: str):
@@ -11,17 +12,8 @@ def say(source_spawnable_entity_id: int, chat_text: str):
 	chat_text = chat_text
 	SpacetimeDBClient.instance._reducer_call("say", source_spawnable_entity_id, chat_text)
 
-def register_on_say(callback: Callable[[bytes, str, str, int, str], None]):
-	if not _check_callback_signature(callback):
-		raise ValueError("Callback signature does not match expected arguments")
-
+def register_on_say(callback: Callable[[Identity, str, str, int, str], None]):
 	SpacetimeDBClient.instance._register_reducer("say", callback)
 
 def _decode_args(data):
 	return [int(data[0]), str(data[1])]
-
-def _check_callback_signature(callback: Callable) -> bool:
-	expected_arguments = [bytes, str, str, int, str]
-	callback_arguments = callback.__annotations__.values()
-
-	return list(callback_arguments) == expected_arguments
