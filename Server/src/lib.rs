@@ -38,16 +38,6 @@ pub fn initialize() {
                 examine: "".into()
             }].to_vec()
     }).unwrap();
-
-    Room::insert(Room {
-        room_id: "hallway".into(),
-
-        zone_id: "nexus".into(),
-        name: "Hallway".into(),
-        description: "".into(),
-        exits: Vec::new(),
-    })
-    .unwrap();
 }
 
 #[spacetimedb(connect)]
