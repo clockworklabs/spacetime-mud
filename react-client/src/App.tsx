@@ -10,69 +10,9 @@ function App() {
   const gameController = useRef(gameControllerGlobal);
   const consoleArea = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [console, setConsole] = useState<JSX.Element[]>([
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, quo?</p>,
-  ]);
+  const [console, setConsole] = useState<JSX.Element[]>([]);
   const [command, setCommand] = React.useState<string>("");
-  const [commandHistory, setCommandHistory] = React.useState<string[]>([
-    "run",
-    "start",
-  ]);
+  const [commandHistory, setCommandHistory] = React.useState<string[]>([]);
   const [commandIndex, setCommandIndex] = React.useState<number>(0);
 
   useEffect(() => {
