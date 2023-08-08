@@ -46,6 +46,13 @@ function App() {
       inputRef.current.onkeyup = (e) => {
         if (e.key === "ArrowUp") {
           //@ts-ignore
+
+          if (window["commandIndex"] < 0) {
+            //@ts-ignore
+            window["commandIndex"] = commandHistory.length - 1;
+          }
+
+          //@ts-ignore
           setCommand(commandHistory[window["commandIndex"]]);
 
           //@ts-ignore
