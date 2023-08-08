@@ -32,7 +32,7 @@ export enum Color {
 }
 
 export class GameController {
-    private readonly DBNAME = 'spacetime-mud'; // replace with your database name
+    private readonly DBNAME = 'spacetime-mud2'; // replace with your database name
 
     private client: SpacetimeDBClient;
     public gameState: GameState = GameState.CONNECTING; // Initialized to connecting state

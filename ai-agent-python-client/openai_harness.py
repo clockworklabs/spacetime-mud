@@ -3,6 +3,7 @@ import openai
 
 import spacetimedb_sdk.local_config as local_config
 import json
+import logger
 
 max_openai_calls_retries = 3
 openai_calls_retried = 0
@@ -17,7 +18,7 @@ def openai_call(
 ):
     #prompt_json = {"name": "World Name", "description": prompt}
     #return json.dumps(prompt_json)
-    print("OPENAI PROMPT: " + prompt + "\n\n")
+    logger.log("openai","[OPENAI][PROMPT]: " + prompt + "\n\n", False)
 
     global initialized    
     if not initialized:
@@ -55,7 +56,9 @@ def openai_call(
             )
             openai_calls_retried = 0
             result = response.choices[0].message.content.strip()
-            print("OPENAI RESULT: " + result + "\n\n")
+
+            logger.log("openai","[OPENAI][RESULT]: " + result + "\n\n",False)
+
             return result
         except Exception as e:
             # try again

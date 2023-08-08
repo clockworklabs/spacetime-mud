@@ -31,7 +31,7 @@ class Player:
 	def __init__(self, data: List[object]):
 		self.data = {}
 		self.data["spawnable_entity_id"] = int(data[0])
-		self.data["identity"] = Identity.from_string(data[1])
+		self.data["identity"] = Identity.from_string(data[1][0])
 
 	def encode(self) -> List[object]:
 		return [self.spawnable_entity_id, self.identity]

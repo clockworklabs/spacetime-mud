@@ -24,6 +24,15 @@ pub fn initialize() {
         connecting_zones: Vec::new(),
     })
     .unwrap();
+
+    Room::insert(Room {
+        room_id: "start".into(),
+
+        zone_id: "nexus".into(),
+        name: "Nexus".into(),
+        description: "    You find yourself in the Nexus, a vast and awe-inspiring chamber that serves as the central hub connecting all the worlds that have been created. The room is adorned with towering marble pillars, their intricate carvings depicting the unique essence of each realm they represent. Sunlight streams through stained glass windows, casting vibrant hues across the polished stone floor, illuminating the boundless possibilities that lie beyond.\n\n        As you stand in the center, you can sense the energy pulsating through the air, a palpable hum that resonates with the whispers of countless adventures waiting to be embarked upon. A network of shimmering portals surrounds you, each one a gateway to a different realm. The soft, ethereal glow emanating from these gateways beckons you to step closer, inviting you to explore the realms that lie just beyond their threshold. With every breath, the Nexus buzzes with the promise of uncharted territories, calling upon your courage to traverse the unknown and make your mark upon the tapestry of this boundless multiverse.".into(),
+        exits: [].to_vec()
+    }).unwrap();
 }
 
 #[spacetimedb(connect)]
