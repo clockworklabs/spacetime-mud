@@ -32,15 +32,15 @@ function App() {
   }, [console]);
 
   useEffect(() => {
+    //@ts-ignore
+    window["commandIndex"] = commandHistory.length - 1;
+
     if (inputRef.current) {
       inputRef.current.onblur = () => {
         // setCommandIndex(0);
       };
 
-      inputRef.current.onfocus = () => {
-        //@ts-ignore
-        window["commandIndex"] = commandHistory.length - 1;
-      };
+      inputRef.current.onfocus = () => {};
 
       // list for keydown
       inputRef.current.onkeyup = (e) => {
@@ -53,7 +53,7 @@ function App() {
         }
       };
     }
-  }, [inputRef]);
+  }, [inputRef, commandHistory]);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
