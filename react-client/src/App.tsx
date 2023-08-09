@@ -32,19 +32,26 @@ function App() {
   }, [console]);
 
   useEffect(() => {
+    //@ts-ignore
+    window["commandIndex"] = commandHistory.length - 1;
+
     if (inputRef.current) {
       inputRef.current.onblur = () => {
         // setCommandIndex(0);
       };
 
-      inputRef.current.onfocus = () => {
-        //@ts-ignore
-        window["commandIndex"] = commandHistory.length - 1;
-      };
+      inputRef.current.onfocus = () => {};
 
       // list for keydown
       inputRef.current.onkeyup = (e) => {
         if (e.key === "ArrowUp") {
+          //@ts-ignore
+
+          if (window["commandIndex"] < 0) {
+            //@ts-ignore
+            window["commandIndex"] = commandHistory.length - 1;
+          }
+
           //@ts-ignore
           setCommand(commandHistory[window["commandIndex"]]);
 
@@ -53,7 +60,7 @@ function App() {
         }
       };
     }
-  }, [inputRef]);
+  }, [inputRef, commandHistory]);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
