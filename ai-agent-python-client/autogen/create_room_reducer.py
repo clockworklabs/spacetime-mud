@@ -7,6 +7,8 @@ from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 from spacetimedb_sdk.spacetimedb_client import Identity
 
 
+reducer_name = "create_room"
+
 def create_room(zone_id: str, room_id: str, name: str, description: str):
 	zone_id = zone_id
 	room_id = room_id

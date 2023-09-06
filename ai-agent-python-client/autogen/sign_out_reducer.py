@@ -7,6 +7,8 @@ from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 from spacetimedb_sdk.spacetimedb_client import Identity
 
 
+reducer_name = "sign_out"
+
 def sign_out(player_spawnable_entity_id: int):
 	player_spawnable_entity_id = player_spawnable_entity_id
 	SpacetimeDBClient.instance._reducer_call("sign_out", player_spawnable_entity_id)

@@ -7,6 +7,8 @@ from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 from spacetimedb_sdk.spacetimedb_client import Identity
 
 
+reducer_name = "say"
+
 def say(source_spawnable_entity_id: int, chat_text: str):
 	source_spawnable_entity_id = source_spawnable_entity_id
 	chat_text = chat_text

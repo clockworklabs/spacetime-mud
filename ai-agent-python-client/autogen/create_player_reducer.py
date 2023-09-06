@@ -7,6 +7,8 @@ from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 from spacetimedb_sdk.spacetimedb_client import Identity
 
 
+reducer_name = "create_player"
+
 def create_player(name: str, description: str):
 	name = name
 	description = description

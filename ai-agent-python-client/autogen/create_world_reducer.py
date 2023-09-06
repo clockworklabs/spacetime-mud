@@ -7,6 +7,8 @@ from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 from spacetimedb_sdk.spacetimedb_client import Identity
 
 
+reducer_name = "create_world"
+
 def create_world(world_id: str, world_name: str, world_description: str):
 	world_id = world_id
 	world_name = world_name

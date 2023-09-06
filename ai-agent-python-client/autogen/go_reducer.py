@@ -7,6 +7,8 @@ from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 from spacetimedb_sdk.spacetimedb_client import Identity
 
 
+reducer_name = "go"
+
 def go(source_spawnable_entity_id: int, exit_direction: str):
 	source_spawnable_entity_id = source_spawnable_entity_id
 	exit_direction = exit_direction

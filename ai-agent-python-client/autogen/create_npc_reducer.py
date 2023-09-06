@@ -7,6 +7,8 @@ from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 from spacetimedb_sdk.spacetimedb_client import Identity
 
 
+reducer_name = "create_npc"
+
 def create_npc(room_id: str, name: str, description: str):
 	room_id = room_id
 	name = name

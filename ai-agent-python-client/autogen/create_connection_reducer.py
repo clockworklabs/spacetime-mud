@@ -7,6 +7,8 @@ from spacetimedb_sdk.spacetimedb_client import SpacetimeDBClient
 from spacetimedb_sdk.spacetimedb_client import Identity
 
 
+reducer_name = "create_connection"
+
 def create_connection(from_room_id: str, to_room_id: str, from_direction: str, to_direction: str, from_exit_description: str, to_exit_description: str):
 	from_room_id = from_room_id
 	to_room_id = to_room_id

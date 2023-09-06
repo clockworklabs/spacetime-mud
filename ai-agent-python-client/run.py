@@ -1,4 +1,7 @@
 import sys
+
+sys.path.insert(0, "../../spacetimedb-python-sdk/src")
+
 import asyncio
 from autogen.location import Location
 from global_vars import GlobalVars
