@@ -118,9 +118,8 @@ if __name__ == "__main__":
     try:
         asyncio.run(spacetime_client.run(
                         auth_token, 
-                        "testnet.spacetimedb.com", 
-                        "spacetime-mud2", 
-                        True, 
+                        "localhost:3000", 
+                        "spacetime-mud", 
                         on_connect, 
                         ["SELECT * FROM Mobile", 
                         "SELECT * FROM Player", 
