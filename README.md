@@ -1,33 +1,25 @@
-# Interactive Game World
+# SpacetimeMUD
+Welcome to SpacetimeMUD, a game project developed in using, Rust (server), Typescript (frontend), and Python (ai-agent) that uses SpacetimeDB to create a text based adventure game commonly known as a "Multi-user dungeon". One twist is that players create the dungeon by giving commands to an AI Agent that connects like a player but uses OpenAI to generate the content from user prompts. While this project is still under development, all the code and assets are open-source and free for anyone to use in their own projects.
 
-Welcome to our Interactive Game World repository. This project is divided into three main components, each residing in its own directory. Here is a quick rundown:
+## Features
 
-## Directories
+-   **Login**: The user's private key is stored locally in their home directory the first time they play and is used to authenticate in future sessions.
+-  **Rooms and Navigation**: Players can see the room description of the current room and use exit connections to travel form room to room.
+- **Chat**: Players can speak to each other and NPCs using say and tell commands.
+- **NPCs**: NPCs can have conversations with players and are driven by prompts sent to OpenAI API.
+-   **Room and NPC Creation**: Players can send messages to the AI Agent asking it to create new rooms and spawn conversational NPCs
 
-### Server
-
-This directory contains the SpaceTimeDB server module. The server manages game state and player interactions. It contains the main logic for the game world, including player connections, room interactions, NPC logic, and the world expansion mechanism.
-
-To run the server, navigate to the Server directory and publish it to your standalone SpacetimeDB instance. For instructions on this view the [SpacetimeDB Docs](https://spacetimedb.com/docs)
-
-### react-client
-
-The react-client directory holds our web client. This is the user interface for our game. It's built with React, a popular JavaScript library for building user interfaces, particularly single-page applications. The react-client interacts with the SpaceTimeDB server to provide players with an interactive experience.
-
-To get started with the react-client, navigate to its directory and run npm start to start it.
-
-### ai-agent-python-client
-
-The ai-agent-python-client is our OpenAI powered agent. This unique component allows players to interact with the AI and request changes to the game world, such as creating new rooms or NPCs. It works by interpreting player commands and then responding in a way that adds to the game world.
-
-To set up and start the ai-agent-python-client, navigate to its directory and run the run.py script. It requires an open-ai key which you can provide on the command line using --openai 
 
 ## Getting Started
 
-Each directory contains its own README.md file with instructions on how to set up and run each part of the project. Start by navigating to the directory of the component you want to run, and follow the instructions there.
+1. [Install SpacetimDB](https://spacetimedb.com/install) and start SpacetimeDB local instance. View the [SpacetimeDB getting started](https://spacetimedb.com/docs/getting-started) guide for detailed instructions.
+2. Navigate to the Server folder. Publish the SpacetimeMUD module to your local instance.
 
-Thank you for checking out our project. We hope you enjoy exploring our interactive game world!
+`spacetime publish spacetimemud`
+
+3. Navigate to the `react-client` folder and run `npm install` and `npm start` to launch a local client. (Requires Node JS to be installed)
+4. To start the AI Agent, navigate to the `ai-agent-python-client` folder and run `python run.py --openai <INSERT_OPENAI_API_KEY>`
 
 ## License
 
-This project is licensed under the terms of the MIT license.
+TBD
